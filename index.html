@@ -6,8 +6,45 @@
     <meta name="author" content="Dennis Ritter, Jannik Portz, Nathalie Junker">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>mme2 - Bob Ross</title>
+    <link rel="stylesheet" href="css/app.css" type="text/css">
 </head>
 <body>
+    <header>
 
+    </header>
+    <main>
+        <aside class="sidebar"></aside>
+        <div class="content">
+            <section class="videos">
+                <figure>
+                    <video class="video" width="640" height="480">
+                        <source src="./res/videos/aerobic.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-controls" data-state="hidden">
+                        <div class="progress">
+                            <progress class="progress" value="0" min="0">
+                                <span class="progress-bar"></span>
+                            </progress>
+                        </div>
+                        <button class="playpause" type="button" data-state="play">Play/Pause</button>
+                        <button class="stop" type="button" data-state="stop">Stop</button>
+                        <button class="mute" type="button" data-state="mute">Mute/Unmute</button>
+                        <button class="volinc" type="button" data-state="volup">Vol+</button>
+                        <button class="voldec" type="button" data-state="voldown">Vol-</button>
+                        <button class="fs" type="button" data-state="go-fullscreen">Fullscreen</button>
+                    </div>
+                </figure>
+                <video class="video" width="640" height="480" controls>
+                    <source src="./res/videos/aerobic.mp4" type="video/mp4">
+                </video>
+                <video class="video" width="640" height="480" controls>
+                    <source src="./res/videos/aerobic.mp4" type="video/mp4">
+                </video>
+            </section>
+        </div>
+    </main>
+    <footer>
+
+    </footer>
 </body>
 </html>
