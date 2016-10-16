@@ -1,11 +1,17 @@
 (function() {
-    window.addEventListener("load", function() {
+    document.addEventListener("DOMContentLoaded", function() {
 
         var initVideos = function() {
             var videoContainers = document.getElementsByClassName('video-container');
 
             var video;
             var videoControls;
+
+            if(videoContainers.length <= 0){
+                console.error('I can´t find any .video-container elements on this page.');
+                return;
+            };
+
             for (var i = 0; i < videoContainers.length; ++i) {
                 video = videoContainers[i].getElementsByClassName('video')[0];
                 videoControls = videoContainers[i].getElementsByClassName('video-controls')[0];
@@ -29,7 +35,7 @@
              */
             var _bind = function(){
                 _this.controls.playpause.addEventListener('click', function() {
-                    _this.play(this);
+                    _this.play();
                 });
 
                 _this.controls.stop.addEventListener('click', function() {
@@ -71,23 +77,30 @@
         /**
          * @description Starts/Pauses the video
          */
-        Video.prototype.play = function(controlElement){
-            if (controlElement.getAttribute('data-state') === 'play') {
+        Video.prototype.play = function(){
+            if (this.controls.playpause.getAttribute('data-state') === 'play') {
                 this.element.play();
-                controlElement.setAttribute('data-state', 'pause');
+                this.controls.playpause.setAttribute('data-state', 'pause');
             }
-            else if (controlElement.getAttribute('data-state') === 'pause') {
+            else if (this.controls.playpause.getAttribute('data-state') === 'pause') {
                 this.element.pause();
-                controlElement.setAttribute('data-state', 'play');
+                this.controls.playpause.setAttribute('data-state', 'play');
             }
         };
 
         /**
-         * @description Stops the video and resets the played time to 0:00
-         * TODO: find out how to stop a video --> built in function?!
+         * @description Pauses the video and resets the played time to 0:00
          */
         Video.prototype.stop = function(){
-            this.element.load();
+            // if the user stops the video and pushes the play button after,
+            // the data-state will be 'pause' and pause the video a second time. To avoid this, the data-state has to be 'play'
+            var btnPlayPause = this.controls.playpause;
+            if(!!btnPlayPause){
+                btnPlayPause.setAttribute('data-state', 'play');
+            };
+
+            this.element.pause();
+            this.element.currentTime = 0;
         };
 
         /**
@@ -100,6 +113,7 @@
             else {
                 this.element.volume += 0.1;
             }
+            this.element.muted = false;
         };
 
         /**
@@ -112,6 +126,7 @@
             else {
                 this.element.volume -= 0.1;
             }
+            this.element.muted = false;
         };
 
         /**
