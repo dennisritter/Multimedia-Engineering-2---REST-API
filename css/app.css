@@ -1,6 +1,12 @@
+a {
+    color: #FFF;
+    text-decoration: none;
+}
+
 /* HEADER */
 header {
     position: fixed;
+    top: 0;
     width: 100%;
     height: 5rem;
     background-color: #FFB800; /* Indian Yellow */
@@ -18,6 +24,7 @@ main {
 .content {
     width: 80%;
     height: auto;
+    margin: 5rem 0 0 0;
 }
 
 .video-container {
@@ -25,7 +32,8 @@ main {
 }
 
 .videos {
-    background-color: #5F2E1F; /* Dark Sienna */
+    width: 100%;
+    background-color: #FFF;
     display: flex;
     flex-direction: column;
 }
@@ -38,16 +46,58 @@ main {
 .video-controls {
     display: flex;
     justify-content: flex-start;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .video-controls button {
     display: block;
     background-color: brown;
+    min-width: 10%;
 }
 
 .sidebar {
     width: 20%;
     height: auto;
+    margin: 5rem 0 0 0;
     background-color: #102E3C; /* Phthalo Green */
+}
+
+.sidebar .anchors {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin: 1em 0 0 0;
+}
+
+footer {
+    bottom: 0;
+    width: 100%;
+    height: 5rem;
+    background-color: #FFB800; /* Indian Yellow */
+}
+
+footer p {
+    text-align: center;
+    margin: 0;
+    padding: 1em 0 0 0;
+}
+
+@media only screen and (max-width: 499px) {
+    .video-controls {
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .video-controls button {
+        width: 100%;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .content {
+        width: 100%;
+    }
 }
