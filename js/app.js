@@ -7,17 +7,18 @@
             var video;
             var videoControls;
 
-            if(videoContainers.length <= 0){
+            if (videoContainers.length < 1) {
                 console.error('I can´t find any .video-container elements on this page.');
                 return;
-            };
+            }
 
             for (var i = 0; i < videoContainers.length; ++i) {
                 video = videoContainers[i].getElementsByClassName('video')[0];
                 videoControls = videoContainers[i].getElementsByClassName('video-controls')[0];
                 new Video(video, videoControls);
             }
-        }
+        };
+
         initVideos();
 
         /**
@@ -57,10 +58,15 @@
                 _this.controls.fullscreen.addEventListener('click', function(){
                     _this.toggleFullscreen();
                 });
+
+                element.addEventListener('timeupdate', function () {
+                    _this.updateTime();
+                });
             };
 
             this.element = element;
-            /* All controlelements for this video */
+
+            /* All control elements for this video */
             this.controls = {
                 playpause: controls.getElementsByClassName('playpause')[0],
                 stop: controls.getElementsByClassName('stop')[0],
@@ -68,11 +74,12 @@
                 volDec: controls.getElementsByClassName('voldec')[0],
                 mute: controls.getElementsByClassName('mute')[0],
                 fullscreen: controls.getElementsByClassName('fullscreen')[0],
-            }
+                time: controls.getElementsByClassName('time')[0]
+            };
 
             // register callbacks for events
             _bind();
-        };
+        }
 
         /**
          * @description Starts/Pauses the video
@@ -134,6 +141,27 @@
          */
         Video.prototype.toggleMute = function(){
             this.element.muted = !this.element.muted;
+        };
+
+        /**
+         * @description Updates the time label
+         */
+        Video.prototype.updateTime = function () {
+            var seconds = this.element.currentTime;
+            var minutes = Math.floor(seconds/60);
+            seconds -= minutes * 60;
+            seconds = '' + Math.floor(seconds);
+            minutes = '' + minutes;
+
+            if (seconds.length < 2) {
+                seconds = '0' + seconds;
+            }
+
+            if (minutes.length < 2) {
+                minutes = '0' + minutes;
+            }
+
+            this.controls.time.innerHTML = minutes + ':' + seconds;
         };
 
         /**

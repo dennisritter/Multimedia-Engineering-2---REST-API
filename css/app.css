@@ -56,6 +56,11 @@ main {
     min-width: 10%;
 }
 
+.video-controls .time {
+    display: inline-block;
+    padding: .5rem 1rem;
+}
+
 .sidebar {
     width: 20%;
     height: auto;
