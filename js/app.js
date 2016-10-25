@@ -126,7 +126,7 @@
          * @param volume - the Volume to set in percent %
          */
         Video.prototype.setVolume = function(volume){
-            if(!!volume && 0 <= volume <= 1){
+            if(typeof volume === Number && 0 <= volume <= 1){
                 this.element.volume = volume;
             }
         };
