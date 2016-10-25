@@ -52,8 +52,13 @@ main {
 
 .video-controls button {
     display: block;
-    background-color: brown;
+    color: white;
+    font-weight: 100;
+    background-color: #102e3c;
     min-width: 10%;
+    border: none;
+    border-radius: 10px;
+    margin: 0 1% 0 1%;
 }
 
 .video-controls .time {
@@ -68,7 +73,7 @@ main {
     background-color: #102E3C; /* Phthalo Green */
 }
 
-.sidebar .anchors {
+nav {
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -95,7 +100,8 @@ footer p {
     }
 
     .video-controls button {
-        width: 100%;
+        width: 98%;
+        margin: 1%;
     }
 
     .sidebar {
