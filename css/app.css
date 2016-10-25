@@ -68,7 +68,7 @@ main {
     background-color: #102E3C; /* Phthalo Green */
 }
 
-.sidebar .anchors {
+nav {
     display: flex;
     flex-direction: column;
     text-align: center;
