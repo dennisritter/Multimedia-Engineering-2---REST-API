@@ -85,10 +85,12 @@
          */
         Video.prototype.play = function(){
             if (this.controls.playpause.getAttribute('data-state') === 'play') {
+                this.controls.playpause.textContent = "pause";
                 this.element.play();
                 this.controls.playpause.setAttribute('data-state', 'pause');
             }
             else if (this.controls.playpause.getAttribute('data-state') === 'pause') {
+                this.controls.playpause.textContent = "play";
                 this.element.pause();
                 this.controls.playpause.setAttribute('data-state', 'play');
             }
@@ -107,6 +109,7 @@
 
             this.element.pause();
             this.element.currentTime = 0;
+            btnPlayPause.textContent = "play";
         };
 
         /**
