@@ -2,7 +2,7 @@
     document.addEventListener("DOMContentLoaded", function() {
 
         /**
-         * @description A Video object that
+         * @description A general Video object
          * @param element - The video DOM element
          * @param controls - The control DOM elements for this video
          * @constructor
@@ -20,7 +20,6 @@
                 volDec: controls.getElementsByClassName('voldec')[0],
                 volSlider: controls.getElementsByClassName('volSlider')[0],
                 mute: controls.getElementsByClassName('mute')[0],
-                fullscreen: controls.getElementsByClassName('fullscreen')[0],
                 time: controls.getElementsByClassName('time')[0]
             };
 
@@ -52,6 +51,7 @@
                 _this.controls.mute.addEventListener('click', function(){
                     _this.toggleMute();
                 });
+                
                 element.addEventListener('timeupdate', function () {
                     _this.updateTime();
                 });
@@ -160,13 +160,8 @@
         };
 
         /**
-         * @description Resizes the to fullscreen/initial size
-         * TODO: find out how to implement fullscreen for videos
+         * @description make all video DOM elements to concrete Video objects
          */
-        Video.prototype.toggleFullscreen = function(){
-            //toggle fullscreen implementation
-        };
-
         var initVideos = function() {
             var videoContainers = document.getElementsByClassName('video-container');
 
