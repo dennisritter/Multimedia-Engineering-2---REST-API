@@ -1,26 +1,6 @@
 (function() {
     document.addEventListener("DOMContentLoaded", function() {
 
-        var initVideos = function() {
-            var videoContainers = document.getElementsByClassName('video-container');
-
-            var video;
-            var videoControls;
-
-            if (videoContainers.length < 1) {
-                console.error('I can´t find any .video-container elements on this page.');
-                return;
-            }
-
-            for (var i = 0; i < videoContainers.length; ++i) {
-                video = videoContainers[i].getElementsByClassName('video')[0];
-                videoControls = videoContainers[i].getElementsByClassName('video-controls')[0];
-                new Video(video, videoControls);
-            }
-        };
-
-        initVideos();
-
         /**
          * @description A Video object that
          * @param element - The video DOM element
@@ -39,7 +19,8 @@
                 volDec: controls.getElementsByClassName('voldec')[0],
                 volSlider: controls.getElementsByClassName('volSlider')[0],
                 mute: controls.getElementsByClassName('mute')[0],
-                // fullscreen: controls.getElementsByClassName('fullscreen')[0],
+                fullscreen: controls.getElementsByClassName('fullscreen')[0],
+                time: controls.getElementsByClassName('time')[0]
             };
 
             /**
@@ -48,6 +29,7 @@
              */
             var _bind = function(){
                 _this.controls.playpause.addEventListener('click', function() {
+                    console.log(_this);
                     _this.play();
                 });
 
@@ -74,22 +56,6 @@
                 element.addEventListener('timeupdate', function () {
                     _this.updateTime();
                 });
-            };
-
-            this.element = element;
-
-            /* All control elements for this video */
-            this.controls = {
-                playpause: controls.getElementsByClassName('playpause')[0],
-                stop: controls.getElementsByClassName('stop')[0],
-                volInc: controls.getElementsByClassName('volinc')[0],
-                volDec: controls.getElementsByClassName('voldec')[0],
-                mute: controls.getElementsByClassName('mute')[0],
-                fullscreen: controls.getElementsByClassName('fullscreen')[0],
-                time: controls.getElementsByClassName('time')[0]
-                // _this.controls.fullscreen.addEventListener('click', function(){
-                //     _this.toggleFullscreen();
-                // });
             };
 
             // register callbacks for events
@@ -121,7 +87,7 @@
             var btnPlayPause = this.controls.playpause;
             if(!!btnPlayPause){
                 btnPlayPause.setAttribute('data-state', 'play');
-            };
+            }
 
             this.element.pause();
             this.element.currentTime = 0;
@@ -201,6 +167,26 @@
         Video.prototype.toggleFullscreen = function(){
             //toggle fullscreen implementation
         };
+
+        var initVideos = function() {
+            var videoContainers = document.getElementsByClassName('video-container');
+
+            var video;
+            var videoControls;
+
+            if (videoContainers.length < 1) {
+                console.error('I can´t find any .video-container elements on this page.');
+                return;
+            }
+
+            for (var i = 0; i < videoContainers.length; ++i) {
+                video = videoContainers[i].getElementsByClassName('video')[0];
+                videoControls = videoContainers[i].getElementsByClassName('video-controls')[0];
+                new Video(video, videoControls);
+            }
+        };
+
+        initVideos();
 
     });
 })();
