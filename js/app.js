@@ -11,6 +11,7 @@
             var _this = this;
 
             this.element = element;
+            
             /* All controlelements for this video */
             this.controls = {
                 playpause: controls.getElementsByClassName('playpause')[0],
@@ -29,7 +30,6 @@
              */
             var _bind = function(){
                 _this.controls.playpause.addEventListener('click', function() {
-                    console.log(_this);
                     _this.play();
                 });
 
@@ -47,7 +47,6 @@
 
                 _this.controls.volSlider.addEventListener('change', function() {
                     _this.setVolume(this.value / 100);
-                    // console.log(this.value / 100);
                 });
 
                 _this.controls.mute.addEventListener('click', function(){
