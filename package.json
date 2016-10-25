@@ -1,0 +1,32 @@
+{
+  "name": "mme2-bobross",
+  "version": "1.0.0",
+  "description": "our first node server - bob ross artist collective",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "bob",
+    "bobross",
+    "rossbob",
+    "art",
+    "arts",
+    "enjoy",
+    "happy",
+    "little",
+    "bushes",
+    "node",
+    "of",
+    "the",
+    "day",
+    "tap",
+    "it"
+  ],
+  "author": "Dennis Ritter, Jannik Portz, Nathalie Junker",
+  "license": "GPL-2.0",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
