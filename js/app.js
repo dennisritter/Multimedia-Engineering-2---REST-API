@@ -29,6 +29,18 @@
         function Video(element, controls) {
             var _this = this;
 
+            this.element = element;
+            /* All controlelements for this video */
+            this.controls = {
+                playpause: controls.getElementsByClassName('playpause')[0],
+                stop: controls.getElementsByClassName('stop')[0],
+                volInc: controls.getElementsByClassName('volinc')[0],
+                volDec: controls.getElementsByClassName('voldec')[0],
+                volSlider: controls.getElementsByClassName('volSlider')[0],
+                mute: controls.getElementsByClassName('mute')[0],
+                // fullscreen: controls.getElementsByClassName('fullscreen')[0],
+            }
+
             /**
              * @description Binds callbackfunctions to specific events
              * @private
@@ -50,25 +62,19 @@
                     _this.volDec();
                 });
 
+                _this.controls.volSlider.addEventListener('change', function() {
+                    _this.setVolume(this.value / 100);
+                    // console.log(this.value / 100);
+                });
+
                 _this.controls.mute.addEventListener('click', function(){
-                   _this.toggleMute();
+                    _this.toggleMute();
                 });
 
-                _this.controls.fullscreen.addEventListener('click', function(){
-                    _this.toggleFullscreen();
-                });
+                // _this.controls.fullscreen.addEventListener('click', function(){
+                //     _this.toggleFullscreen();
+                // });
             };
-
-            this.element = element;
-            /* All controlelements for this video */
-            this.controls = {
-                playpause: controls.getElementsByClassName('playpause')[0],
-                stop: controls.getElementsByClassName('stop')[0],
-                volInc: controls.getElementsByClassName('volinc')[0],
-                volDec: controls.getElementsByClassName('voldec')[0],
-                mute: controls.getElementsByClassName('mute')[0],
-                fullscreen: controls.getElementsByClassName('fullscreen')[0],
-            }
 
             // register callbacks for events
             _bind();
@@ -114,6 +120,7 @@
                 this.element.volume += 0.1;
             }
             this.element.muted = false;
+            this.controls.volSlider.value = this.element.volume * 100;
         };
 
         /**
@@ -127,6 +134,17 @@
                 this.element.volume -= 0.1;
             }
             this.element.muted = false;
+            this.controls.volSlider.value = this.element.volume * 100;
+        };
+
+        /**
+         * @description Sets the volume to the given volume parameter
+         * @param volume - the Volume to set in percent %
+         */
+        Video.prototype.setVolume = function(volume){
+            if(!!volume && 0 <= volume <= 1){
+                this.element.volume = volume;
+            }
         };
 
         /**
