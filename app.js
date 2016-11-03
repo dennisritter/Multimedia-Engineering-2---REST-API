@@ -27,6 +27,8 @@ app.get('/file.txt', (req, res) => {
     });
 });
 
+
+// if public-folder requested, use static-folder
 app.get(/\/public\/.*/, function(req, res) {
     const errorFile = path.join(__dirname + '/error.html');
     const reqPath = path.join(__dirname + '/static/' + req.originalUrl.substring(8));
@@ -37,6 +39,14 @@ app.get(/\/public\/.*/, function(req, res) {
     }else{
         res.sendFile(errorFile);
     }
+});
+
+// display time
+app.get('/time', function(req, res) {
+    const d = new Date();
+    const time =  d.getHours() + ":" + d.getMinutes() + ": " + d.getSeconds();
+    res.header('content-type', 'text/plain');
+    res.send('The current time is: ' + time);
 });
 
 // Always keep as last registration
