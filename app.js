@@ -44,7 +44,7 @@ app.get(/\/public\/.*/, function(req, res) {
 // display time
 app.get('/time', function(req, res) {
     const d = new Date();
-    const time =  d.getHours() + ":" + d.getMinutes() + ": " + d.getSeconds();
+    const time =  d.getHours() + ":" + d.getMinutes();
     res.header('content-type', 'text/plain');
     res.send('The current time is: ' + time);
 });
