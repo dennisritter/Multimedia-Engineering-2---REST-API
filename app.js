@@ -1,6 +1,7 @@
 /**
  * Created by Dennis Ritter, Jannik Portz, Nathalie Junker
  */
+"use strict";
 
 const express = require('express');
 
