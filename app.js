@@ -65,4 +65,5 @@ app.use(function(err, req, res, next){
     res.status(err.status).end();
 })
 
-app.listen(3000, () => console.log("hallo!"));
+app.listen(3000, () => console.log("Du hast 1 serwer gestartet! vong port 3000 her."));
+
