@@ -54,4 +54,15 @@ app.get(/.*/, function(req, res) {
     res.sendFile(path.join(__dirname + '/helloworld.html'));
 });
 
+//ERRORHANDLING
+app.use(function(req,res, next){
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+})
+
+app.use(function(err, req, res, next){
+    res.status(err.status).end();
+})
+
 app.listen(3000, () => console.log("hallo!"));
