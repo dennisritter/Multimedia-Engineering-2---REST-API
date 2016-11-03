@@ -44,4 +44,4 @@ app.get(/.*/, function(req, res) {
     res.sendFile(path.join(__dirname + '/helloworld.html'));
 });
 
-app.listen(3000, () => console.log("hallo!"));
+app.listen(3000, () => console.log("Du hast 1 serwer auf port 3000 gestartet!"));
