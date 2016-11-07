@@ -43,19 +43,25 @@ const memoizeReadFile = function (readFile) {
 // Register express static middleware to provide files in static directory
 app.use('/public', express.static(path.join(__dirname, 'static')));
 
+// Create memoized version of fs.readFile
 const readFile = memoizeReadFile(fs.readFile);
 app.get('/file.txt', (req, res) => {
+    // Capture current system time before file read
     const beforeRead = process.hrtime();
     res.setHeader('Content-Type', 'text/plain');
     readFile(txtFile, (err, content) => {
         if (!!err) {
+            // Send error response
             process.stderr.write(err.toString());
             res.status(500);
             res.send('Error reading file');
             return;
         }
 
+        // Calculate difference when file has been read
         const diff = process.hrtime(beforeRead);
+
+        // Append time difference to content
         content += `\n` + (diff[0] * 1e9 + diff[1]) + ' nanoseconds';
         res.send(content);
     });
@@ -86,16 +92,16 @@ app.get('/time',(req, res) => {
 // Always keep as last registration
 app.get(/.*/, (req, res) => { res.sendFile(path.join(__dirname + '/helloworld.html')) });
 
-/**
- * ERRORHANDLING
- */
+// Throw error when no middleware has handled the request by now
 app.use((req,res, next) => {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-app.use((err, req, res, next)  => { res.status(err.status).end() });
+// Error handling
+// Catch all errors and send corresponding response
+app.use((err, req, res, next)  => res.status(err.status).end());
 
 /**
  * START SERVER
