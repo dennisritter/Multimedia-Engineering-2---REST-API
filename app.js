@@ -11,6 +11,9 @@ const app = express();
 
 const txtFile = path.join(__dirname, 'file.txt');
 
+// Register express static middleware to provide files in static directory
+app.use('/public', express.static(path.join(__dirname, 'static')));
+
 app.get('/file.txt', (req, res) => {
     const beforeRead = process.hrtime();
     res.setHeader('Content-Type', 'text/plain');
