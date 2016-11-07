@@ -1,6 +1,9 @@
 /**
- * Created by Dennis Ritter, Jannik Portz, Nathalie Junker
+ * Simple Express server containing static file delivery, cached delivery of file.txt and endpoint for current system time.
+ *
+ * @author Dennis Ritter, Jannik Portz, Nathalie Junker
  */
+
 "use strict";
 
 const express = require('express');
@@ -11,13 +14,40 @@ const app = express();
 
 const txtFile = path.join(__dirname, 'file.txt');
 
+// Create wrapper memoizing function around fs.readFile
+const memoizeReadFile = function (readFile) {
+    // Dictionary mapping file name to cached file contents
+    const cache = {};
+
+    // Create new function
+    return (path, callback) => {
+        if (cache.hasOwnProperty(path)) {
+            // If file content exist in cache, serve it synchronously without error
+            callback(undefined, cache[path]);
+        } else {
+            // If file is not present in cache, load it asynchronously from fs
+            readFile(path, (err, data) => {
+                if (err) {
+                    // If error while reading file, pass it to callback without content
+                    callback(err, null);
+                } else {
+                    // If reading file succeeded, put contents into cache and pass to callback
+                    cache[path] = data;
+                    callback(undefined, data);
+                }
+            });
+        }
+    };
+};
+
 // Register express static middleware to provide files in static directory
 app.use('/public', express.static(path.join(__dirname, 'static')));
 
+const readFile = memoizeReadFile(fs.readFile);
 app.get('/file.txt', (req, res) => {
     const beforeRead = process.hrtime();
     res.setHeader('Content-Type', 'text/plain');
-    fs.readFile(txtFile, (err, content) => {
+    readFile(txtFile, (err, content) => {
         if (!!err) {
             process.stderr.write(err.toString());
             res.status(500);
