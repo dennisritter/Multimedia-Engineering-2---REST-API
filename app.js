@@ -58,14 +58,14 @@ app.get('/file.txt', (req, res, next) => {
             var err = new Error('Error reading file');
             err.status = 500;
             next(err);
+        }else{
+            // Calculate difference when file has been read
+            const diff = process.hrtime(beforeRead);
+
+            // Append time difference to content
+            content += `\n` + (diff[0] * 1e9 + diff[1]) + ' nanoseconds';
+            res.send(content);
         }
-
-        // Calculate difference when file has been read
-        const diff = process.hrtime(beforeRead);
-
-        // Append time difference to content
-        content += `\n` + (diff[0] * 1e9 + diff[1]) + ' nanoseconds';
-        res.send(content);
     });
 });
 
@@ -82,14 +82,18 @@ app.get(/.*/, (req, res) => { res.sendFile(path.join(__dirname + '/helloworld.ht
 
 // Error handling
 // Throw error when no middleware has handled the request by now
-app.use((req,res, next) => {
+app.use((req, res, next) => {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
 // Catch all errors and send corresponding response
-app.use((err, req, res, next) => res.status(err.status).end());
+app.use((err, req, res, next) => {
+    res.status(err.status).end();
+    console.log(err);
+    console.log(err.stack);
+});
 
 // Start server
 app.listen(3000, () => console.log("Du hast 1 serwer gestartet! vong port 3000 her."));
