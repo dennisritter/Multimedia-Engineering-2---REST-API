@@ -1,0 +1,17 @@
+{
+  "name": "me2-u3_rest_in_node",
+  "version": "0.0.1",
+  "author": "Johannes Konert",
+  "description": "A simple prototypical REST API sceleton for exercises.",
+  "licence": "CC BY-SA 4.0",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.13.2",
+    "debug": "~2.2.0",
+    "express": "~4.13.1"
+  }
+}
