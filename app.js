@@ -6,9 +6,10 @@
 
 "use strict";
 
-const express = require('express');
+// node module imports
 const path = require('path');
 const fs = require('fs');
+const express = require('express');
 
 const app = express();
 
@@ -29,9 +30,11 @@ const memoizeReadFile = function (readFile) {
             readFile(path, (err, data) => {
                 if (err) {
                     // If error while reading file, pass it to callback without content
+                    // --> fs.readFile callback is not decorated in this case
                     callback(err, null);
                 } else {
                     // If reading file succeeded, put contents into cache and pass to callback
+                    // --> fs.readFile callback is decorated. Data is stored in cache before fs.readFile callback is executed
                     cache[path] = data;
                     callback(undefined, data);
                 }
@@ -45,17 +48,16 @@ app.use('/public', express.static(path.join(__dirname, 'static')));
 
 // Create memoized version of fs.readFile
 const readFile = memoizeReadFile(fs.readFile);
-app.get('/file.txt', (req, res) => {
+app.get('/file.txt', (req, res, next) => {
     // Capture current system time before file read
     const beforeRead = process.hrtime();
     res.setHeader('Content-Type', 'text/plain');
     readFile(txtFile, (err, content) => {
         if (!!err) {
-            // Send error response
-            process.stderr.write(err.toString());
-            res.status(500);
-            res.send('Error reading file');
-            return;
+            // Define Error and pass to errorhandler
+            var err = new Error('Error reading file');
+            err.status = 500;
+            next(err);
         }
 
         // Calculate difference when file has been read
@@ -65,20 +67,6 @@ app.get('/file.txt', (req, res) => {
         content += `\n` + (diff[0] * 1e9 + diff[1]) + ' nanoseconds';
         res.send(content);
     });
-});
-
-
-// if public-folder requested, use static-folder
-app.get(/\/public\/.*/, (req, res) => {
-    const errorFile = path.join(__dirname + '/error.html');
-    const reqPath = path.join(__dirname + '/static/' + req.originalUrl.substring(8));
-    const exists = fs.existsSync(reqPath);
-
-    if(exists){
-        res.sendFile(path.join(reqPath));
-    }else{
-        res.sendFile(errorFile);
-    }
 });
 
 // display time
@@ -92,6 +80,7 @@ app.get('/time',(req, res) => {
 // Always keep as last registration
 app.get(/.*/, (req, res) => { res.sendFile(path.join(__dirname + '/helloworld.html')) });
 
+// Error handling
 // Throw error when no middleware has handled the request by now
 app.use((req,res, next) => {
     var err = new Error('Not Found');
@@ -99,12 +88,9 @@ app.use((req,res, next) => {
     next(err);
 });
 
-// Error handling
 // Catch all errors and send corresponding response
-app.use((err, req, res, next)  => res.status(err.status).end());
+app.use((err, req, res, next) => res.status(err.status).end());
 
-/**
- * START SERVER
- */
+// Start server
 app.listen(3000, () => console.log("Du hast 1 serwer gestartet! vong port 3000 her."));
 
