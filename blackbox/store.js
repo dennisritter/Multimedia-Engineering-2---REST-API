@@ -31,15 +31,11 @@ var globalCounter = (function() {
 var tweets = [
     {   id: globalCounter(),
         message: "Hello world tweet",
-        creator: {
-            href: "http://localhost:3000/users/103"
-        }
+        creator: 103
     },
     {   id: globalCounter(),
         message: "Another nice tweet",
-        creator: {
-            href: "http://localhost:3000/users/104"
-        }
+        creator: 104
     }
 ];
 var users = [

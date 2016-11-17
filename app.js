@@ -96,28 +96,59 @@ app.put('/tweets/:id', function(req,res,next) {
 //USERS
 app.route('/users')
     .get(function(req,res,next) {
-        res.json(store.select('tweets'));
+        let users = store.select('users');
+        let tweets = store.select('tweets');
+
+        users.map( (user) => {
+            user.tweets = {
+                href: `http://localhost:3000/users/${user.id}/tweets`
+            }
+            return user;
+        });
+
+        if(req.query.expand === 'tweets'){
+            users.map( (user) => {
+                user.tweets.items = tweets.filter( (tweet) => tweet.creator === user.id);
+                return user;
+            });
+        }
+        res.status(200).json(users);
     })
     .post(function(req,res,next) {
-        var id = store.insert('tweets', req.body);
+        var id = store.insert('users', req.body);
         // set code 201 "created" and send the item back
-        res.status(201).json(store.select('tweets', id));
+        res.status(201).json(store.select('users', id));
     });
 
 app.route('/users/:id')
     .get(function(req,res,next) {
-        res.json(store.select('tweets', req.params.id));
+        let user = store.select('users', req.params.id);
+
+        user.tweets = {
+            href: `http://localhost:3000/users/${user.id}/tweets`
+        }
+        res.status(200).json(user);
     })
     .delete(function(req,res,next) {
-        store.remove('tweets', req.params.id);
+        store.remove('users', req.params.id);
         res.status(200).end();
     })
     .put(function(req,res,next) {
-        store.replace('tweets', req.params.id, req.body);
+        store.replace('users', req.params.id, req.body);
         res.status(200).end();
     });
 
-// TODO: add your routes etc.
+app.get('/users/:id/tweets', function(req, res, next){
+    let tweets = store.select('tweets').filter( (tweet) => tweet.creator === parseInt(req.params.id, 10) );
+    tweets = tweets.map( (tweet) => {
+        tweet.creator = {
+            href: 'http://localhost:3000/users/' + tweet.creator,
+            id: tweet.creator
+        }
+        return tweet;
+    });
+    res.status(200).json(tweets);
+});
 
 
 // CatchAll for the rest (unfound routes/resources) ********
