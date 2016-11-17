@@ -93,22 +93,34 @@ app.put('/tweets/:id', function(req,res,next) {
 });
 
 
-//USERS
+// USERS-RESSOURCE
 app.route('/users')
     .get(function(req,res,next) {
         let users = store.select('users');
         let tweets = store.select('tweets');
 
+        // append tweets href
         users.map( (user) => {
             user.tweets = {
                 href: `http://localhost:3000/users/${user.id}/tweets`
-            }
+            };
             return user;
         });
 
+        // expand all tweets of every user if required
         if(req.query.expand === 'tweets'){
+
             users.map( (user) => {
-                user.tweets.items = tweets.filter( (tweet) => tweet.creator === user.id);
+                // get all tweets of the user
+                let usersTweets = tweets.filter( (tweet) => tweet.creator === user.id);
+
+                user.tweets.items = usersTweets.map( (tweet) =>{
+                    console.log(tweet);
+                    return {
+                        tweet,
+                        href: `http://localhost:3000/tweets/${tweet.id}`
+                    };
+                });
                 return user;
             });
         }
