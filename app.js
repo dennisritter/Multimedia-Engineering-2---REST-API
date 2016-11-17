@@ -66,6 +66,7 @@ app.use(function(req, res, next) {
 
 // Routes ***************************************
 
+//TWEETS
 app.get('/tweets', function(req,res,next) {
     res.json(store.select('tweets'));
 });
@@ -91,6 +92,30 @@ app.put('/tweets/:id', function(req,res,next) {
     res.status(200).end();
 });
 
+
+//USERS
+app.route('/users')
+    .get(function(req,res,next) {
+        res.json(store.select('tweets'));
+    })
+    .post(function(req,res,next) {
+        var id = store.insert('tweets', req.body);
+        // set code 201 "created" and send the item back
+        res.status(201).json(store.select('tweets', id));
+    });
+
+app.route('/users/:id')
+    .get(function(req,res,next) {
+        res.json(store.select('tweets', req.params.id));
+    })
+    .delete(function(req,res,next) {
+        store.remove('tweets', req.params.id);
+        res.status(200).end();
+    })
+    .put(function(req,res,next) {
+        store.replace('tweets', req.params.id, req.body);
+        res.status(200).end();
+    });
 
 // TODO: add your routes etc.
 
