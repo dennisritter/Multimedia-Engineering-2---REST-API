@@ -66,7 +66,7 @@ app.use(function(req, res, next) {
 
 // Routes ***************************************
 
-//TWEETS
+// TWEETS-RESSOURCE
 app.get('/tweets', function(req,res,next) {
     res.json(store.select('tweets'));
 });
@@ -120,10 +120,10 @@ app.route('/users')
         res.status(201).json(store.select('users', id));
     });
 
+// relevant operations for a specific user
 app.route('/users/:id')
     .get(function(req,res,next) {
         let user = store.select('users', req.params.id);
-
         user.tweets = {
             href: `http://localhost:3000/users/${user.id}/tweets`
         }
@@ -138,11 +138,12 @@ app.route('/users/:id')
         res.status(200).end();
     });
 
+// relevant operations for a specific user's tweets
 app.get('/users/:id/tweets', function(req, res, next){
     let tweets = store.select('tweets').filter( (tweet) => tweet.creator === parseInt(req.params.id, 10) );
     tweets = tweets.map( (tweet) => {
         tweet.creator = {
-            href: 'http://localhost:3000/users/' + tweet.creator,
+            href: `http://localhost:3000/users/${tweet.creator}`,
             id: tweet.creator
         }
         return tweet;
