@@ -115,11 +115,8 @@ app.route('/users')
                 let usersTweets = tweets.filter( (tweet) => tweet.creator === user.id);
 
                 user.tweets.items = usersTweets.map( (tweet) =>{
-                    console.log(tweet);
-                    return {
-                        tweet,
-                        href: `http://localhost:3000/tweets/${tweet.id}`
-                    };
+                    tweet.href = `http://localhost:3000/tweets/${tweet.id}`;
+                    return tweet;
                 });
                 return user;
             });
