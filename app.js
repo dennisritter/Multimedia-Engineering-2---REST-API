@@ -116,6 +116,10 @@ app.route('/users')
 
                 user.tweets.items = usersTweets.map( (tweet) =>{
                     tweet.href = `http://localhost:3000/tweets/${tweet.id}`;
+                    tweet.creator = {
+                        id: tweet.creator,
+                        href: `http://localhost:3000/users/${tweet.creator}`
+                    }
                     return tweet;
                 });
                 return user;
