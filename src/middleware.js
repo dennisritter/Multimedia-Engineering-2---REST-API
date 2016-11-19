@@ -9,7 +9,7 @@
  * @inheritDoc
  */
 const logging = (req, res, next) => {
-  console.log('Request of type '+req.method + ' to URL ' + req.originalUrl);
+  console.log('Request of type ' + req.method + ' to URL ' + req.originalUrl);
   next();
 };
 
@@ -33,8 +33,7 @@ const apiVersionControl = (req, res, next) => {
  * @inheritDoc
  */
 const acceptJson = (req, res, next) => {
-  if (['POST', 'PUT'].indexOf(req.method) > -1 &&
-    !( /application\/json/.test(req.get('Content-Type')) )) {
+  if (['POST', 'PUT'].indexOf(req.method) > -1 && !( /application\/json/.test(req.get('Content-Type')) )) {
     // send error code 415: unsupported media type
     res.status(415).send('wrong Content-Type');  // user has SEND the wrong type
   } else if (!req.accepts('json')) {
