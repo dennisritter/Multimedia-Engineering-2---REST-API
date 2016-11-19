@@ -92,6 +92,34 @@ app.put('/tweets/:id', function(req,res,next) {
     res.status(200).end();
 });
 
+app.patch('/tweets/:id', function(req, res, next) {
+    let id = req.params.id;
+    if (!id.match(/^[1-9][0-9]*$/)) {
+        const error = new Error(`The id parameter must be an integer`);
+        error.status = 422;
+        next(error);
+        return;
+    }
+
+    id = parseInt(id);
+
+    const tweet = store.select('tweets', id);
+    if (!tweet) {
+        const error = new Error(`A tweet with id ${id} does not exist`);
+        error.status = 404;
+        next(error);
+        return;
+    }
+
+    ['message', 'creator'].forEach((prop) => {
+        if (req.body.hasOwnProperty(prop))
+            tweet[prop] = req.body[prop];
+    });
+
+    store.replace('tweets', id, tweet);
+    res.sendStatus(200);
+});
+
 
 // USERS-RESSOURCE
 app.route('/users')
@@ -139,7 +167,7 @@ app.route('/users/:id')
         let user = store.select('users', req.params.id);
         user.tweets = {
             href: `http://localhost:3000/users/${user.id}/tweets`
-        }
+        };
         res.status(200).json(user);
     })
     .delete(function(req,res,next) {
