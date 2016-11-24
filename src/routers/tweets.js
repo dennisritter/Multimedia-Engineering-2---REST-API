@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
  * POST /
  * Adds a new tweet to the collection
  */
-router.post('/', function (req, res) => {
+router.post('/', (req, res) => {
   var id = store.insert('tweets', req.body);
   res.status(201).json(store.select('tweets', id));
 });
