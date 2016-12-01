@@ -23,8 +23,15 @@ var videos = express.Router();
 // routes **********************
 videos.route('/')
     .get(function(req, res, next) {
-        res.locals.items = store.select('videos');
-        next();
+
+        const videos = store.select('videos');
+        if (videos === undefined){
+            next();
+        } else {
+            res.locals.items = videos;
+            next();
+        }
+
     })
     .post(function(req, res, next) {
         let data = req.body;
