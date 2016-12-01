@@ -16,6 +16,7 @@
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
+const videoValidator = require('./../validators/videos');
 
 var videos = express.Router();
 
@@ -23,6 +24,7 @@ var videos = express.Router();
 var requiredKeys = {title: 'string', src: 'string', length: 'number'};
 var optionalKeys = {description: 'string', playcount: 'number', ranking: 'number'};
 var internalKeys = {id: 'number', timestamp: 'number'};
+
 
 // routes **********************
 videos.route('/')
@@ -32,53 +34,27 @@ videos.route('/')
     })
     .post(function(req, res, next) {
         let data = req.body;
-        const allKeys = Object.assign({}, requiredKeys, optionalKeys, internalKeys);
 
-        // Check if required keys present
-        for (let key in requiredKeys) {
-            if (!data.hasOwnProperty(key)) {
-                const err = new Error(`Required property ${key} must be present`);
-                err.status = 400;
-                next(err);
-                return;
-            }
+        try {
+            data = videoValidator(data);
+            // Insert new record
+            store.insert('videos', data);
+
+            // Send new record back
+            res.locals.items = data;
+            res.status(201);
+            next();
+        } catch (err) {
+            next(err);
         }
-
-        // Check for valid types
-        for (let key in allKeys) {
-            if (data.hasOwnProperty(key) && typeof data[key] !== allKeys[key]) {
-                const err = new Error(`Property ${key} must be of type ${allKeys[key]}`);
-                err.status = 400;
-                next(err);
-                return;
-            }
-        }
-
-        // Remove invalid properties
-        for (let key in data) {
-            if (!allKeys.hasOwnProperty(key)) {
-                delete data[key];
-            }
-        }
-
-        // Set default values and timestamp
-        data = Object.assign({
-            description: '',
-            playcount: 0,
-            ranking: 0,
-            timestamp: new Date()
-        }, data);
-
-        // Insert new record
-        store.insert('videos', data);
-
-        // Send new record back
-        res.locals.items = data;
-
-        res.status(201);
-        next();
     });
-// TODO
+
+videos.route('/:id')
+  .post(function (req, res, next) {
+      const err = new Error('You cannot perform a POST request on this endpoint.');
+      err.status = 405;
+      next(err);
+  });
 
 
 
