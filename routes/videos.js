@@ -20,12 +20,6 @@ const videoValidator = require('./../validators/videos');
 
 var videos = express.Router();
 
-// if you like, you can use this for task 1.b:
-var requiredKeys = {title: 'string', src: 'string', length: 'number'};
-var optionalKeys = {description: 'string', playcount: 'number', ranking: 'number'};
-var internalKeys = {id: 'number', timestamp: 'number'};
-
-
 // routes **********************
 videos.route('/')
     .get(function(req, res, next) {
