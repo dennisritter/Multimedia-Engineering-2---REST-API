@@ -88,7 +88,7 @@ var store = {
     insert: function(type, element) {
         checkElement(element);
         if (element.id !== undefined) {
-            throw new Error("element already has an .id value, but should not on insert!",e);
+            throw new Error("element already has an .id value, but should not on insert!",element);
         }
         element.id = globalCounter();
         memory[type] = memory[type] || [];
