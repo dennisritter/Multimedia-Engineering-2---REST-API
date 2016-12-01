@@ -22,9 +22,18 @@ const validateVideo = function (data) {
     }
   }
 
+  // Check for positive numbers
+  for (let key in allKeys) {
+    if (typeof data[key] === "number" && data[key] < 0){
+      const err = new Error(`${key} must not be negative. Please enter a positive value.`);
+      err.status = 400;
+      throw err;
+    }
+  }
+
   // Remove invalid properties
   for (let key in data) {
-    if (!allKeys.hasOwnProperty(key)) {
+    if (!allKeys.hasOwnProperty(key) || key === "timestamp") {
       delete data[key];
     }
   }
