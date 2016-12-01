@@ -17,6 +17,7 @@ var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
 const videoValidator = require('./../validators/videos');
+const videoDeleteValidator = require('./../validators/videos-delete');
 
 var videos = express.Router();
 
@@ -49,6 +50,19 @@ videos.route('/')
             next(err);
         }
     });
+    .delete(function(req,res,next){
+        let data = req.body;
+        try{
+            data = videoDeleteValidator(data);
+            // Remove video from store
+            store.remove('videos', data.id);
+            // Send status without content
+            next();
+        } catch (err){
+            next(err);
+        }
+
+    })
 
 videos.route('/:id')
   .post(function (req, res, next) {
