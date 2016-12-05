@@ -83,6 +83,9 @@ videos.route('/:id')
             data = videoValidator(data);
             //replace video with matching id
             store.replace('videos', data.id, data);
+            // Send updated record back
+            res.locals.items = data;
+            res.status(200);
             next();
         }
         catch(err){
