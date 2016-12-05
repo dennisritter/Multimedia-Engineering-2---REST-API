@@ -1,6 +1,6 @@
 const requiredKeys = {title: 'string', src: 'string', length: 'number'};
 const optionalKeys = {description: 'string', playcount: 'number', ranking: 'number'};
-const internalKeys = {id: 'number', timestamp: 'number'};
+const internalKeys = {id: 'number', timestamp: 'string'};
 const allKeys = Object.assign({}, requiredKeys, optionalKeys, internalKeys);
 
 const validateVideo = function (data) {
@@ -16,6 +16,7 @@ const validateVideo = function (data) {
   // Check for valid types
   for (let key in allKeys) {
     if (data.hasOwnProperty(key) && typeof data[key] !== allKeys[key]) {
+      console.log(typeof data[key], "!=", allKeys[key]);
       const err = new Error(`Property ${key} must be of type ${allKeys[key]}`);
       err.status = 400;
       throw err;
@@ -43,7 +44,7 @@ const validateVideo = function (data) {
     description: '',
     playcount: 0,
     ranking: 0,
-    timestamp: new Date()
+    timestamp: new Date().toString()
   }, data);
 
   return data;
