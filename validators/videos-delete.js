@@ -7,7 +7,7 @@ const validateVideoDEL = function(data) {
     const video = data.id;
 
     // Check for missing id
-    if (!video){
+    if (!video) {
         const err = new Error(`Please send a valid id.`);
         err.status = 404;
         throw err;
@@ -28,7 +28,7 @@ const validateVideoDEL = function(data) {
     }
 
     //Check for existing video-id in store
-    if(store.select('videos', video) == undefined){
+    if (store.select('videos', video) == undefined) {
         const err = new Error(`An element with ID ${video} does not exist.`);
         err.status = 404;
         throw err;
