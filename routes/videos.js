@@ -56,20 +56,20 @@ videos.route('/')
         const err = new Error('You cannot perform a PUT request on this endpoint (without id).');
         err.status = 405;
         next(err);
-    })
-    .delete(function(req, res, next) {
-        let data = req.body;
-        try {
-            data = videoDeleteValidator(data);
-            // Remove video from store
-            store.remove('videos', data.id);
-            // Send status without content
-            next();
-        }
-        catch (err) {
-            next(err);
-        }
     });
+    // .delete(function(req, res, next) {
+    //     let data = req.body;
+    //     try {
+    //         data = videoDeleteValidator(data);
+    //         // Remove video from store
+    //         store.remove('videos', data.id);
+    //         // Send status without content
+    //         next();
+    //     }
+    //     catch (err) {
+    //         next(err);
+    //     }
+    // });
 
 videos.route('/:id')
     .post(function(req, res, next) {
@@ -77,6 +77,31 @@ videos.route('/:id')
         err.status = 405;
         next(err);
     })
+    .put(function(req,res,next){
+        let data = req.body;
+        try {
+            data = videoValidator(data);
+            //replace video with matching id
+            store.replace('videos', data.id, data);
+            next();
+        }
+        catch(err){
+            next(err);
+        }
+    })
+    .delete(function(req, res, next) {
+        let id = req.params.id;
+        try {
+            id = videoDeleteValidator(id);
+            // Remove video from store
+            store.remove('videos', id);
+            // Send status without content
+            next();
+        }
+        catch (err) {
+            next(err);
+        }
+});
 
 
 // this middleware function can be used, if you like (or remove it)
