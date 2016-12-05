@@ -44,7 +44,7 @@ const validateVideo = function (data) {
     description: '',
     playcount: 0,
     ranking: 0,
-    timestamp: new Date().toString()
+    timestamp: new Date().getTime().toString()
   }, data);
 
   return data;
