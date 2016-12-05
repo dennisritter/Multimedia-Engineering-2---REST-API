@@ -52,10 +52,8 @@ videos.route('/')
             next(err);
         }
     })
-
-videos.route('/:id')
-    .post(function(req, res, next) {
-        const err = new Error('You cannot perform a POST request on this endpoint.');
+    .put(function(req, res, next) {
+        const err = new Error('You cannot perform a PUT request on this endpoint (without id).');
         err.status = 405;
         next(err);
     })
@@ -72,6 +70,13 @@ videos.route('/:id')
             next(err);
         }
     });
+
+videos.route('/:id')
+    .post(function(req, res, next) {
+        const err = new Error('You cannot perform a POST request on this endpoint.');
+        err.status = 405;
+        next(err);
+    })
 
 
 // this middleware function can be used, if you like (or remove it)

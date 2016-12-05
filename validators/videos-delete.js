@@ -7,7 +7,7 @@ const validateVideoDEL = function(data) {
     const video = data.id;
 
     // Check for missing id
-    if (video === undefined){
+    if (!video){
         const err = new Error(`Please send a valid id.`);
         err.status = 404;
         throw err;
