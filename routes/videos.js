@@ -26,9 +26,10 @@ videos.route('/')
     .get(function(req, res, next) {
 
         const videos = store.select('videos');
-        if (videos === undefined){
+        if (videos === undefined) {
             next();
-        } else {
+        }
+        else {
             res.locals.items = videos;
             next();
         }
@@ -46,41 +47,42 @@ videos.route('/')
             res.locals.items = data;
             res.status(201);
             next();
-        } catch (err) {
+        }
+        catch (err) {
             next(err);
         }
-    });
-    .delete(function(req,res,next){
+    })
+
+videos.route('/:id')
+    .post(function(req, res, next) {
+        const err = new Error('You cannot perform a POST request on this endpoint.');
+        err.status = 405;
+        next(err);
+    })
+    .delete(function(req, res, next) {
         let data = req.body;
-        try{
+        try {
             data = videoDeleteValidator(data);
             // Remove video from store
             store.remove('videos', data.id);
             // Send status without content
             next();
-        } catch (err){
+        }
+        catch (err) {
             next(err);
         }
-
-    })
-
-videos.route('/:id')
-  .post(function (req, res, next) {
-      const err = new Error('You cannot perform a POST request on this endpoint.');
-      err.status = 405;
-      next(err);
-  });
-
+    });
 
 
 // this middleware function can be used, if you like (or remove it)
-videos.use(function(req, res, next){
+videos.use(function(req, res, next) {
     // if anything to send has been added to res.locals.items
     if (res.locals.items) {
         // then we send it as json and remove it
         res.json(res.locals.items);
         delete res.locals.items;
-    } else {
+    }
+    else {
         // otherwise we set status to no-content
         res.set('Content-Type', 'application/json');
         res.status(204).end(); // no content;
