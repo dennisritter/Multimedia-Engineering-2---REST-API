@@ -57,19 +57,6 @@ videos.route('/')
         err.status = 405;
         next(err);
     });
-    // .delete(function(req, res, next) {
-    //     let data = req.body;
-    //     try {
-    //         data = videoDeleteValidator(data);
-    //         // Remove video from store
-    //         store.remove('videos', data.id);
-    //         // Send status without content
-    //         next();
-    //     }
-    //     catch (err) {
-    //         next(err);
-    //     }
-    // });
 
 videos.route('/:id')
     .post(function(req, res, next) {
