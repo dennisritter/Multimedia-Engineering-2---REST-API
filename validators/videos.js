@@ -50,4 +50,4 @@ const validateVideo = function (data) {
   return data;
 };
 
-module.exports = validateVideo;
+module.exports = {validateVideo, requiredKeys, optionalKeys, internalKeys, allKeys};

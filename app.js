@@ -23,6 +23,7 @@ var debug = require('debug')('me2u4:server');
 // own modules
 var store = require('./blackbox/store.js');
 var restAPIchecks = require('./restapi/request-checks.js');
+var {filterParser} = require('./restapi/filter.js');
 var videos = require('./routes/videos');
 
 
@@ -41,6 +42,7 @@ app.use(requestLogger('dev'));
 // API request checks for API-version and JSON etc. (same checks as in Ü3)
 app.use(restAPIchecks);
 
+app.use(filterParser);
 
 // Routes ******************************************************
 app.use('/videos', videos);

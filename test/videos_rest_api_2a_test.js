@@ -23,7 +23,7 @@ var videoCorrectMin = cfg.videoCorrectMin;
 var videoCorrectMax = cfg.videoCorrectMax;
 
 // start of tests ********************************************************************************
-describe.skip('Task 2.a Filter', function() {
+describe('Task 2.a Filter', function() {
     var videoCorrect1Result = null;
     var videoCorrect2Result = null;
     var videoIDsCleanup = [];
