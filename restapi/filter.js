@@ -4,16 +4,16 @@ const filterParser = function(req, res, next){
     "use strict";
 
     const filterParams = {};
-    const allowedFilter = ['filter', 'limit', 'offset'];
-
-    Object.keys(req.query).forEach(key => {
-        if(allowedFilter.indexOf(key) < 0){
-            const err = new Error('key not valid');
-            err.status = 400;
-            next(err);
-            return;
-        }
-    });
+    // const allowedFilter = ['filter', 'limit', 'offset'];
+    //
+    // Object.keys(req.query).forEach(key => {
+    //     if(allowedFilter.indexOf(key) < 0){
+    //         const err = new Error('filter not valid');
+    //         err.status = 400;
+    //         next(err);
+    //         return;
+    //     }
+    // });
 
     if(req.query.hasOwnProperty('filter')){
         filterParams.filter = req.query.filter.split(',').map(s => s.trim());
