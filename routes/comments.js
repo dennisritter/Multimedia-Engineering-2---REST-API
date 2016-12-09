@@ -65,13 +65,6 @@ comments.route('/:id')
     })
     .put((req,res,next) => {
         let comment = req.body;
-        let oldComment = store.select('comments', comment.id);
-        if (!oldComment) {
-            const err = new Error(`A comment with id '${comment.id}' does not exist.`);
-            err.status = 404;
-            next(err);
-            return;
-        }
         try {
             comment = validateComment(comment);
             store.replace('comments', comment.id, comment);
@@ -82,7 +75,60 @@ comments.route('/:id')
         catch(err){
             next(err);
         }
+    })
+    .delete((req,res,next) => {
+        const id = req.params.id;
+        try{
+            store.remove('comments', id);
+            res.status = 200;
+            next();
+        }
+        catch(err){
+            next(err);
+        }
+    });
 
+comments.route('/videos/:videoid')
+    .get((req,res,next) => {
+        const videoId = req.params.videoid;
+        const video = store.select('videos', videoId);
+        if(!video){
+            const err = new Error(`A video with id ${videoId} does not exist.`);
+            err.status = 404;
+            next(err);
+            return;
+        }
+        let comments = store.select('comments');
+        if(comments.length > 0) {
+            comments.filter((comment) => {
+                return comment.videoid === parseInt(videoId, 10);
+            });
+            res.locals.items = comments;
+            res.status = 200;
+            next();
+        }
+    })
+    .delete((req,res,next) => {
+        const videoId = req.params.videoid;
+        const video = store.select('videos', videoId);
+        if(!video){
+            const err = new Error(`A video with id ${videoId} does not exist.`);
+            err.status = 404;
+            next(err);
+            return;
+        }
+        let comments = store.select('comments').forEach((comment) => {
+            if(comment.videoid === parseInt(videoId, 10)){
+                try{
+                    store.remove('comments', comment.id);
+                    res.status = 200;
+                    next();
+                }
+                catch(err){
+                    next(err);
+                }
+            }
+        });
     });
 
 comments.use(filterResponseData);
