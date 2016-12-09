@@ -16,8 +16,8 @@ const filterParser = (req, res, next) => {
     // Set filterParams.filter to array of specified attributes
     if (req.query.hasOwnProperty('filter')) {
         filterParams.filter = req.query.filter.split(',').map(s => s.trim());
-        for (let i = 0; i < filterParams.filter; ++i) {
-            if (!allKeys.hasOwnProperty(key)) {
+        for (let i = 0; i < filterParams.filter.length; ++i) {
+            if (!allKeys.hasOwnProperty(filterParams.filter[i])) {
                 const err = new Error(`key not valid`);
                 err.status = 400;
                 next(err);
@@ -64,7 +64,7 @@ const filterResponseData = (req, res, next) => {
     }
 
     const filterParams = res.locals.filterParams;
-    let data = res.locals.data;
+    let data = res.locals.items;
     const isSingle = !Array.isArray(data);
 
     // Filter
@@ -92,6 +92,7 @@ const filterResponseData = (req, res, next) => {
         data = data.slice(filterParams.offset, limit);
     }
 
+    console.log(data);
     res.locals.items = data;
     next();
 };
