@@ -23,7 +23,9 @@ var debug = require('debug')('me2u4:server');
 // own modules
 var restAPIchecks = require('./restapi/request-checks.js');
 var {filterParser, filterResponseData} = require('./restapi/filter.js');
+//routes
 var videos = require('./routes/videos');
+var comments = require('./routes/comments');
 
 
 
@@ -43,6 +45,7 @@ app.use(restAPIchecks);
 
 // Routes ******************************************************
 app.use('/videos', videos);
+app.use('/comments', comments);
 
 // this middleware function can be used, if you like (or remove it)
 app.use(function(req, res) {
