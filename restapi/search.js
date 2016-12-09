@@ -25,7 +25,7 @@ const searchParserFactory = (keyMapping) => {
             let val = query[key];
             // Reject if a non-numeric query has been entered for a number property
             if (keyMapping[key] === 'number') {
-                const val = parseInt(query[key]);
+                val = parseInt(query[key]);
                 if (isNaN(val)) {
                     const err = new Error(`Search query for property ${key} must be a number`);
                     err.status = 400;
