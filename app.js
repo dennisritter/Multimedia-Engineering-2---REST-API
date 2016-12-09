@@ -58,7 +58,8 @@ app.use(function(req, res) {
     else {
         // otherwise we set status to no-content
         res.set('Content-Type', 'application/json');
-        res.status(204).end(); // no content;
+        res.status = 204
+        res.end(); // no content;
     }
 });
 
@@ -78,7 +79,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         debug('Server responds with error: ', err.stack);
-        res.status(err.status || 500);
+        res.status = err.status || 500;
         res.json({
             error: {
                 message: err.message,
