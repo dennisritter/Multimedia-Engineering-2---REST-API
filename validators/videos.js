@@ -1,6 +1,6 @@
 const requiredKeys = {title: 'string', src: 'string', length: 'number'};
-const optionalKeys = {description: 'string', playcount: 'number', ranking: 'number'};
-const internalKeys = {id: 'number', timestamp: 'string'};
+const optionalKeys = {description: 'string', playcount: 'number', ranking: 'number', comments: 'array'};
+const internalKeys = {id: 'number', timestamp: 'number'};
 const allKeys = Object.assign({}, requiredKeys, optionalKeys, internalKeys);
 
 const validateVideo = function (data) {
@@ -44,7 +44,7 @@ const validateVideo = function (data) {
     description: '',
     playcount: 0,
     ranking: 0,
-    timestamp: new Date().getTime().toString()
+    timestamp: new Date().getTime()
   }, data);
 
   return data;
