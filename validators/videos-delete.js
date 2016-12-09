@@ -1,4 +1,6 @@
-var store = require('../blackbox/store');
+const store = require('../blackbox/store');
+const HTTPError = require('./http-error');
+
 const internalKeys = {id: 'number', timestamp: 'string'};
 
 const validateVideoDEL = function(id) {
@@ -17,16 +19,12 @@ const validateVideoDEL = function(id) {
     }
     // Check for valid id type
     if (typeof video !== internalKeys.id) {
-        const err = new Error(`Property of id must be of type ${internalKeys.id} or a parsable string`);
-        err.status = 404;
-        throw err;
+        throw new HTTPError(`Property of id must be of type ${internalKeys.id} or a parsable string`, 404);
     }
 
     //Check for existing video-id in store
     if (!store.select('videos', video)) {
-        const err = new Error(`An element with ID ${video} does not exist.`);
-        err.status = 404;
-        throw err;
+        throw new HTTPError(`An element with ID ${video} does not exist.`, 404);
     }
 
     return video;

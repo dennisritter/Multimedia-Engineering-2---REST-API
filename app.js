@@ -26,6 +26,7 @@ var {filterParser, filterResponseData} = require('./restapi/filter.js');
 //routes
 var videos = require('./routes/videos');
 var comments = require('./routes/comments');
+const HTTPError = require('./validators/http-error');
 
 
 
@@ -68,9 +69,7 @@ app.use(function(req, res) {
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     debug('Catching unmatched request to answer with 404', req.url);
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+    next(new HTTPError('Not Found', 404));
 });
 
 // error handlers (express recognizes it by 4 parameters!)
