@@ -42,9 +42,8 @@ const data = [
     }
 ];
 
-const promises = [];
-data.forEach((record) => {
-    const p = axios({
+const promises = data.map((record) => {
+    return axios({
         method: 'post',
         url: videoUrl,
         data: record,
@@ -54,8 +53,6 @@ data.forEach((record) => {
             'Content-Type': 'application/json'
         }
     });
-
-    promises.push(p);
 });
 
 Promise.all(promises).then(() => process.exit(0));
