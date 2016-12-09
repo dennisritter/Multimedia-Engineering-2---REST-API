@@ -94,8 +94,26 @@ videos.route('/:id')
         let id = req.params.id;
         try {
             id = videoDeleteValidator(id);
+
+            let comments = store.select('comments')
+            if(comments.length > 0){
+                comments.forEach((comment) => {
+                    if(comment.videoid === parseInt(id, 10)){
+                        try{
+                            store.remove('comments', comment.id);
+                            res.status = 200;
+                            next();
+                        }
+                        catch(err){
+                            next(err);
+                        }
+                    }
+                });
+            }
+
             // Remove video from store
             store.remove('videos', id);
+            res.status = 200;
             // Send status without content
             next();
         }
