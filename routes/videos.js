@@ -19,10 +19,12 @@ var store = require('../blackbox/store');
 const {validateVideo, allKeys} = require('./../validators/videos');
 const videoDeleteValidator = require('./../validators/videos-delete');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
+const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
 
 var videos = express.Router();
 
 videos.use(filterParserFactory(Object.keys(allKeys)));
+videos.use(searchParserFactory(allKeys));
 
 const methodNotAllowed = (req, res, next) => {
     const err = new Error(`Method ${req.method} is not allowed.`);
@@ -106,6 +108,7 @@ videos.route('/:id')
     .post(methodNotAllowed)
     .patch(methodNotAllowed);
 
+videos.use(searchResponseFilterFactory(allKeys));
 videos.use(filterResponseData);
 
 module.exports = videos;

@@ -5,7 +5,7 @@
  */
 const searchParserFactory = (keyMapping) => {
     // Array of query keys that are also allowed
-    const supplementalValidQueryParams = ['offset', 'limit'];
+    const supplementalValidQueryParams = ['filter', 'offset', 'limit'];
 
     return (req, res, next) => {
         const search = {};
@@ -25,6 +25,7 @@ const searchParserFactory = (keyMapping) => {
             search[key] = query[key];
         }
 
+        console.log(res.locals);
         if (!res.locals.filterParams) {
             res.locals.filterParams = {};
         }
