@@ -46,17 +46,6 @@ app.use(filterParser);
 // Routes ******************************************************
 app.use('/videos', videos);
 
-
-// (from express-generator boilerplate  standard code)
-// Errorhandling and requests without proper URLs ************************
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    debug('Catching unmatched request to answer with 404');
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
 app.use(filterResponseData);
 
 // this middleware function can be used, if you like (or remove it)
@@ -74,6 +63,15 @@ app.use(function(req, res) {
     }
 });
 
+// (from express-generator boilerplate  standard code)
+// Errorhandling and requests without proper URLs ************************
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    debug('Catching unmatched request to answer with 404', req.url);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
 
 // error handlers (express recognizes it by 4 parameters!)
 // development error handler

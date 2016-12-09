@@ -61,10 +61,11 @@ const filterParser = function(req, res, next){
 const filterResponseData = (req, res, next) => {
     if (!res.locals.items) {
         next();
+        return;
     }
 
     const filterParams = res.locals.filterParams;
-    const isSingle = Array.isArray(res.locals.items);
+    const isSingle = !Array.isArray(res.locals.items);
 
     // Always operate with array to keep it simple
     let items = isSingle ? [res.locals.items] : res.locals.items;
@@ -91,6 +92,7 @@ const filterResponseData = (req, res, next) => {
     }
 
     res.locals.items = items;
+    next();
 };
 
 module.exports = {filterParser, filterResponseData};

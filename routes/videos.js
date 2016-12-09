@@ -16,7 +16,7 @@
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
-const videoValidator = require('./../validators/videos');
+const {validateVideo} = require('./../validators/videos');
 const videoDeleteValidator = require('./../validators/videos-delete');
 
 var videos = express.Router();
@@ -36,7 +36,7 @@ videos.route('/')
         let data = req.body;
 
         try {
-            data = videoValidator(data);
+            data = validateVideo(data);
             // Insert new record
             store.insert('videos', data);
 
@@ -66,6 +66,7 @@ videos.route('/:id')
         }
 
         res.locals.items = video;
+        next();
     })
     .post(function(req, res, next) {
         const err = new Error('You cannot perform a POST request on this endpoint.');
@@ -75,7 +76,7 @@ videos.route('/:id')
     .put(function(req,res,next){
         let data = req.body;
         try {
-            data = videoValidator(data);
+            data = validateVideo(data);
             //replace video with matching id
             store.replace('videos', data.id, data);
             // Send updated record back
