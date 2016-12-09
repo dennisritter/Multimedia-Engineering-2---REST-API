@@ -105,8 +105,52 @@ videos.route('/:id')
             next(err);
         }
     })
-    .post(methodNotAllowed)
-    .patch(methodNotAllowed);
+    .patch((req, res, next) => {
+        const original = store.select('videos', req.params.id);
+
+        const validKeys = Object.keys(allKeys);
+        validKeys.splice(validKeys.indexOf('id'), 1);
+        const data = req.body;
+        for (let key in data) {
+            if (!data.hasOwnProperty(key)) {
+                continue;
+            }
+
+            if (validKeys.indexOf(key) < 0) {
+                const err = new Error(`Property ${key} is not allowed in request body`);
+                err.status = 400;
+                next(err);
+                return;
+            }
+
+            if (key === 'playcount') {
+                let value = data[key];
+                if (!value.match(/^(?:\+|-)[0-9]+$/)) {
+                    const err = new Error('playcount must be in the format (+|-)[0-9]+ (e.g. +1, -2)');
+                    err.status = 400;
+                    next(err);
+                    return;
+                }
+
+                original.playcount += parseInt(value);
+                continue;
+            }
+
+            if (typeof data[key] !== allKeys[key]) {
+                const err = new Error(`Property ${key} must be a ${allKeys[key]} but is a ${typeof data[key]}`);
+                err.status = 400;
+                next(err);
+                return;
+            }
+
+            original[key] = data[key];
+        }
+
+        store.replace('videos', original.id, original);
+        res.locals.items = original;
+        next();
+    })
+    .post(methodNotAllowed);
 
 videos.use(searchResponseFilterFactory(allKeys));
 videos.use(filterResponseData);
