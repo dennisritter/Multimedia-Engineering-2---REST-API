@@ -21,6 +21,12 @@ const videoDeleteValidator = require('./../validators/videos-delete');
 
 var videos = express.Router();
 
+const methodNotAllowed = (req, res, next) => {
+    const err = new Error(`Method ${req.method} is not allowed.`);
+    err.status = 405;
+    next(err);
+};
+
 // routes **********************
 videos.route('/')
     .get(function(req, res, next) {
@@ -49,11 +55,9 @@ videos.route('/')
             next(err);
         }
     })
-    .put(function(req, res, next) {
-        const err = new Error('You cannot perform a PUT request on this endpoint (without id).');
-        err.status = 405;
-        next(err);
-    });
+    .put(methodNotAllowed)
+    .patch(methodNotAllowed)
+    .delete(methodNotAllowed);
 
 videos.route('/:id')
     .get((req, res, next) => {
@@ -67,11 +71,6 @@ videos.route('/:id')
 
         res.locals.items = video;
         next();
-    })
-    .post(function(req, res, next) {
-        const err = new Error('You cannot perform a POST request on this endpoint.');
-        err.status = 405;
-        next(err);
     })
     .put(function(req,res,next){
         let data = req.body;
@@ -100,6 +99,8 @@ videos.route('/:id')
         catch (err) {
             next(err);
         }
-    });
+    })
+    .post(methodNotAllowed)
+    .patch(methodNotAllowed);
 
 module.exports = videos;
