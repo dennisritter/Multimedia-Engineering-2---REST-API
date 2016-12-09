@@ -29,7 +29,8 @@ var globalCounter = (function() {
 
 // our "in memory database" is a simple object!
 var memory = {
-    videos: []
+    videos: [],
+    comments: []
 };
 // some default store content could be added here
 
