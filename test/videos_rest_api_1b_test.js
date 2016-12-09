@@ -286,7 +286,8 @@ describe('Task 1.b JSON Error data', function() {
                         done();
                     }
                 });
-        };
+        }
+
         if (numDone === 0) {
             done();
         }

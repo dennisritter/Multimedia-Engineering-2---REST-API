@@ -1,38 +1,32 @@
-const {requiredKeys, optionalKeys, internalKeys, allKeys} = require('./../validators/videos.js');
+const {allKeys} = require('./../validators/videos.js');
 
-const filterParser = function(req, res, next){
-    "use strict";
-
+/**
+ * Middleware parsing the filter params specified in the Query string.
+ * Creates a filterParams object and attached it to res.locals
+ * @inheritDoc
+ */
+const filterParser = (req, res, next) => {
+    // Default params
     const filterParams = {
         filter: [],
         offset: 0,
         limit: -1
     };
 
-    // const allowedFilter = ['filter', 'limit', 'offset'];
-    //
-    // Object.keys(req.query).forEach(key => {
-    //     if(allowedFilter.indexOf(key) < 0){
-    //         const err = new Error('filter not valid');
-    //         err.status = 400;
-    //         next(err);
-    //         return;
-    //     }
-    // });
-
+    // Set filterParams.filter to array of specified attributes
     if (req.query.hasOwnProperty('filter')) {
         filterParams.filter = req.query.filter.split(',').map(s => s.trim());
-        filterParams.filter.forEach(key => {
-            if(!allKeys.hasOwnProperty(key)){
+        for (let i = 0; i < filterParams.filter; ++i) {
+            if (!allKeys.hasOwnProperty(key)) {
                 const err = new Error(`key not valid`);
                 err.status = 400;
                 next(err);
-                // TODO: actually return from middleware and not from forEach callback
                 return;
             }
-        });
+        }
     }
 
+    // Parse and validate offset
     if (req.query.hasOwnProperty('offset')) {
         filterParams.offset = parseInt(req.query.offset);
         if(isNaN(filterParams.offset) || filterParams.offset < 0){
@@ -44,6 +38,7 @@ const filterParser = function(req, res, next){
 
     }
 
+    // Parse and validate limit
     if (req.query.hasOwnProperty('limit')) {
         filterParams.limit = parseInt(req.query.limit);
         if(isNaN(filterParams.limit) || filterParams.limit <= 0){
@@ -58,6 +53,10 @@ const filterParser = function(req, res, next){
     next();
 };
 
+/**
+ * Middleware actually filtering the response data according to the filterParams
+ * @inheritDoc
+ */
 const filterResponseData = (req, res, next) => {
     if (!res.locals.items) {
         next();
@@ -65,24 +64,23 @@ const filterResponseData = (req, res, next) => {
     }
 
     const filterParams = res.locals.filterParams;
-    const isSingle = !Array.isArray(res.locals.items);
-
-    // Always operate with array to keep it simple
-    let items = isSingle ? [res.locals.items] : res.locals.items;
-    // TODO: maybe create deep copy?
+    let data = res.locals.data;
+    const isSingle = !Array.isArray(data);
 
     // Filter
     if (filterParams.filter && filterParams.filter.length > 0) {
-        items = items.map((item) => {
+        const filterObject = (obj) => {
             const newItem = {};
-            filterParams.filter.forEach(key => newItem[key] = item[key] || null);
+            filterParams.filter.forEach(key => newItem[key] = obj[key]);
             return newItem;
-        });
+        };
+
+        data = isSingle ? filterObject(data) : data.map(filterObject);
     }
 
     // Offset and Limit only for collections
     if (!isSingle) {
-        if (filterParams.offset >= items.length) {
+        if (filterParams.offset >= data.length) {
             const err = new Error(`Offset must not be greater than the number of available items items`);
             err.status = 400;
             next(err);
@@ -90,15 +88,11 @@ const filterResponseData = (req, res, next) => {
         }
 
         // Calculate start and end index of elements to serve in response and create a new array containing only the desired items
-        const limit = filterParams.limit > -1 ? filterParams.offset + filterParams.limit : items.length;
-        items = items.slice(filterParams.offset, limit);
+        const limit = filterParams.limit > -1 ? filterParams.offset + filterParams.limit : data.length;
+        data = data.slice(filterParams.offset, limit);
     }
 
-    if (isSingle) {
-        items = items[0];
-    }
-
-    res.locals.items = items;
+    res.locals.items = data;
     next();
 };
 
