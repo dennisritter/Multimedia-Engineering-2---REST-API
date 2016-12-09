@@ -92,7 +92,6 @@ const filterResponseData = (req, res, next) => {
         data = data.slice(filterParams.offset, limit);
     }
 
-    console.log(data);
     res.locals.items = data;
     next();
 };
