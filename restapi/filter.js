@@ -82,6 +82,13 @@ const filterResponseData = (req, res, next) => {
 
     // Offset and Limit only for collections
     if (!isSingle) {
+        if (filterParams.offset >= items.length) {
+            const err = new Error(`Offset must not be greater than the number of available items items`);
+            err.status = 400;
+            next(err);
+            return;
+        }
+
         // Calculate start and end index of elements to serve in response and create a new array containing only the desired items
         const limit = filterParams.limit > -1 ? filterParams.offset + filterParams.limit : items.length;
         items = items.slice(filterParams.offset, limit);
