@@ -2,6 +2,7 @@ const requiredKeys = {title: 'string', src: 'string', length: 'number'};
 const optionalKeys = {description: 'string', playcount: 'number', ranking: 'number'};
 const internalKeys = {id: 'number', timestamp: 'string'};
 const allKeys = Object.assign({}, requiredKeys, optionalKeys, internalKeys);
+const HTTPError = require('./http-error');
 
 const validateVideo = function (data) {
   // Check if required keys present
@@ -15,20 +16,19 @@ const validateVideo = function (data) {
 
   // Check for valid types
   for (let key in allKeys) {
+    if (!allKeys.hasOwnProperty(key)) {
+      continue;
+    }
+
     if (data.hasOwnProperty(key) && typeof data[key] !== allKeys[key]) {
-      console.log(typeof data[key], "!=", allKeys[key]);
-      const err = new Error(`Property ${key} must be of type ${allKeys[key]}`);
-      err.status = 400;
-      throw err;
+      throw new HTTPError(`Property ${key} must be of type ${allKeys[key]}`, 400);
     }
   }
 
   // Check for positive numbers
   for (let key in allKeys) {
     if (typeof data[key] === "number" && data[key] < 0){
-      const err = new Error(`${key} must not be negative. Please enter a positive value.`);
-      err.status = 400;
-      throw err;
+      throw new HTTPError(`${key} must not be negative. Please enter a positive value.`, 400);
     }
   }
 

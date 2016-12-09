@@ -20,6 +20,7 @@ const {validateVideo, allKeys} = require('./../validators/videos');
 const videoDeleteValidator = require('./../validators/videos-delete');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
+const HTTPError = require('./../validators/http-error');
 
 var videos = express.Router();
 
@@ -68,10 +69,7 @@ videos.route('/:id')
     .get((req, res, next) => {
         const video = store.select('videos', req.params.id);
         if (!video) {
-            const err = new Error(`A video with id ${req.params.id} does not exist.`);
-            err.status = 404;
-            next(err);
-            return;
+            return next(new HTTPError(`A video with id ${req.params.id} does not exist.`, 404));
         }
 
         res.locals.items = video;
@@ -108,39 +106,36 @@ videos.route('/:id')
     .patch((req, res, next) => {
         const original = store.select('videos', req.params.id);
 
+
         const validKeys = Object.keys(allKeys);
+        // Remove id (you cannot patch id)
         validKeys.splice(validKeys.indexOf('id'), 1);
         const data = req.body;
+
         for (let key in data) {
             if (!data.hasOwnProperty(key)) {
                 continue;
             }
 
+            // Ingore invalid properties
             if (validKeys.indexOf(key) < 0) {
-                const err = new Error(`Property ${key} is not allowed in request body`);
-                err.status = 400;
-                next(err);
-                return;
+                continue;
             }
 
+            // Custom patch mechanism for playcount
             if (key === 'playcount') {
                 let value = data[key];
                 if (!value.match(/^(?:\+|-)[0-9]+$/)) {
-                    const err = new Error('playcount must be in the format (+|-)[0-9]+ (e.g. +1, -2)');
-                    err.status = 400;
-                    next(err);
-                    return;
+                    return next(new HTTPError('playcount must be in the format (+|-)[0-9]+ (e.g. +1, -2)', 400));
                 }
 
                 original.playcount += parseInt(value);
                 continue;
             }
 
+            // Error, if types of values do not match
             if (typeof data[key] !== allKeys[key]) {
-                const err = new Error(`Property ${key} must be a ${allKeys[key]} but is a ${typeof data[key]}`);
-                err.status = 400;
-                next(err);
-                return;
+                return next(new HTTPError(`Property ${key} must be a ${allKeys[key]} but is a ${typeof data[key]}`, 400));
             }
 
             original[key] = data[key];
