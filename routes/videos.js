@@ -101,20 +101,4 @@ videos.route('/:id')
         }
     });
 
-
-// this middleware function can be used, if you like (or remove it)
-videos.use(function(req, res, next) {
-    // if anything to send has been added to res.locals.items
-    if (res.locals.items) {
-        // then we send it as json and remove it
-        res.json(res.locals.items);
-        delete res.locals.items;
-    }
-    else {
-        // otherwise we set status to no-content
-        res.set('Content-Type', 'application/json');
-        res.status(204).end(); // no content;
-    }
-});
-
 module.exports = videos;

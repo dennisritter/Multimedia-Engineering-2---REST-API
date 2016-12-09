@@ -21,9 +21,8 @@ var requestLogger = require('morgan');
 var debug = require('debug')('me2u4:server');
 
 // own modules
-var store = require('./blackbox/store.js');
 var restAPIchecks = require('./restapi/request-checks.js');
-var {filterParser} = require('./restapi/filter.js');
+var {filterParser, filterResponseData} = require('./restapi/filter.js');
 var videos = require('./routes/videos');
 
 
@@ -48,10 +47,6 @@ app.use(filterParser);
 app.use('/videos', videos);
 
 
-
-
-
-
 // (from express-generator boilerplate  standard code)
 // Errorhandling and requests without proper URLs ************************
 // catch 404 and forward to error handler
@@ -60,6 +55,23 @@ app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
+});
+
+app.use(filterResponseData);
+
+// this middleware function can be used, if you like (or remove it)
+app.use(function(req, res) {
+    // if anything to send has been added to res.locals.items
+    if (res.locals.items) {
+        // then we send it as json and remove it
+        res.json(res.locals.items);
+        delete res.locals.items;
+    }
+    else {
+        // otherwise we set status to no-content
+        res.set('Content-Type', 'application/json');
+        res.status(204).end(); // no content;
+    }
 });
 
 
