@@ -24,16 +24,13 @@ var videos = express.Router();
 // routes **********************
 videos.route('/')
     .get(function(req, res, next) {
-
         const videos = store.select('videos');
         if (videos === undefined) {
             next();
-        }
-        else {
+        } else {
             res.locals.items = videos;
             next();
         }
-
     })
     .post(function(req, res, next) {
         let data = req.body;
@@ -59,6 +56,17 @@ videos.route('/')
     });
 
 videos.route('/:id')
+    .get((req, res, next) => {
+        const video = store.select('videos', req.params.id);
+        if (!video) {
+            const err = new Error(`A video with id ${req.params.id} does not exist.`);
+            err.status = 404;
+            next(err);
+            return;
+        }
+
+        res.locals.items = video;
+    })
     .post(function(req, res, next) {
         const err = new Error('You cannot perform a POST request on this endpoint.');
         err.status = 405;
@@ -91,7 +99,7 @@ videos.route('/:id')
         catch (err) {
             next(err);
         }
-});
+    });
 
 
 // this middleware function can be used, if you like (or remove it)
