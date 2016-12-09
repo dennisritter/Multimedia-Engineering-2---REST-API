@@ -80,8 +80,6 @@ const filterResponseData = (req, res, next) => {
 
     // Offset and Limit only for collections
     if (!isSingle) {
-        if (filterParams.offset >= data.length && filterParams.offset > 0) {
-            const err = new Error(`Offset must not be greater than the number of available items`);
         if (filterParams.offset >= data.length && data.length > 0) {
             const err = new Error(`Offset must not be greater than the number of available items`);
             err.status = 400;
