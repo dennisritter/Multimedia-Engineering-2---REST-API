@@ -1,56 +1,56 @@
-const {allKeys} = require('./../validators/videos.js');
-
 /**
- * Middleware parsing the filter params specified in the Query string.
- * Creates a filterParams object and attached it to res.locals
- * @inheritDoc
+ * Creates a middleware handler parsing the filter params to a filterParams object
+ * @param       {array}     availableKeys   Array of available keys of the resource collection
+ * @returns     {Function}                  Middleware handler
  */
-const filterParser = (req, res, next) => {
-    // Default params
-    const filterParams = {
-        filter: [],
-        offset: 0,
-        limit: -1
-    };
+const filterParserFactory = (availableKeys) => {
+    return (req, res, next) => {
+        // Default params
+        const filterParams = {
+            filter: [],
+            offset: 0,
+            limit: -1
+        };
 
-    // Set filterParams.filter to array of specified attributes
-    if (req.query.hasOwnProperty('filter')) {
-        filterParams.filter = req.query.filter.split(',').map(s => s.trim());
-        for (let i = 0; i < filterParams.filter.length; ++i) {
-            if (!allKeys.hasOwnProperty(filterParams.filter[i])) {
-                const err = new Error(`key not valid`);
+        // Set filterParams.filter to array of specified attributes
+        if (req.query.hasOwnProperty('filter')) {
+            filterParams.filter = req.query.filter.split(',').map(s => s.trim());
+            for (let i = 0; i < filterParams.filter.length; ++i) {
+                if (availableKeys.indexOf(filterParams.filter[i]) < 0) {
+                    const err = new Error(`key not valid`);
+                    err.status = 400;
+                    next(err);
+                    return;
+                }
+            }
+        }
+
+        // Parse and validate offset
+        if (req.query.hasOwnProperty('offset')) {
+            filterParams.offset = parseInt(req.query.offset);
+            if(isNaN(filterParams.offset) || filterParams.offset < 0){
+                const err = new Error(`Offset must be a number >= 0`);
+                err.status = 400;
+                next(err);
+                return;
+            }
+
+        }
+
+        // Parse and validate limit
+        if (req.query.hasOwnProperty('limit')) {
+            filterParams.limit = parseInt(req.query.limit);
+            if(isNaN(filterParams.limit) || filterParams.limit <= 0){
+                const err = new Error(`Limit must be a number > 0`);
                 err.status = 400;
                 next(err);
                 return;
             }
         }
-    }
 
-    // Parse and validate offset
-    if (req.query.hasOwnProperty('offset')) {
-        filterParams.offset = parseInt(req.query.offset);
-        if(isNaN(filterParams.offset) || filterParams.offset < 0){
-            const err = new Error(`Offset must be a number >= 0`);
-            err.status = 400;
-            next(err);
-            return;
-        }
-
-    }
-
-    // Parse and validate limit
-    if (req.query.hasOwnProperty('limit')) {
-        filterParams.limit = parseInt(req.query.limit);
-        if(isNaN(filterParams.limit) || filterParams.limit <= 0){
-            const err = new Error(`Limit must be a number > 0`);
-            err.status = 400;
-            next(err);
-            return;
-        }
-    }
-
-    res.locals.filterParams = filterParams;
-    next();
+        res.locals.filterParams = filterParams;
+        next();
+    };
 };
 
 /**
@@ -97,4 +97,4 @@ const filterResponseData = (req, res, next) => {
     next();
 };
 
-module.exports = {filterParser, filterResponseData};
+module.exports = {filterParserFactory, filterResponseData};

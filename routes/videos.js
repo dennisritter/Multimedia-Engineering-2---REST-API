@@ -16,10 +16,13 @@
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
-const {validateVideo} = require('./../validators/videos');
+const {validateVideo, allKeys} = require('./../validators/videos');
 const videoDeleteValidator = require('./../validators/videos-delete');
+const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 
 var videos = express.Router();
+
+videos.use(filterParserFactory(Object.keys(allKeys)));
 
 const methodNotAllowed = (req, res, next) => {
     const err = new Error(`Method ${req.method} is not allowed.`);
@@ -102,5 +105,7 @@ videos.route('/:id')
     })
     .post(methodNotAllowed)
     .patch(methodNotAllowed);
+
+videos.use(filterResponseData);
 
 module.exports = videos;

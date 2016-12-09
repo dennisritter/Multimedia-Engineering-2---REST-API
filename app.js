@@ -41,12 +41,8 @@ app.use(requestLogger('dev'));
 // API request checks for API-version and JSON etc. (same checks as in Ü3)
 app.use(restAPIchecks);
 
-app.use(filterParser);
-
 // Routes ******************************************************
 app.use('/videos', videos);
-
-app.use(filterResponseData);
 
 // this middleware function can be used, if you like (or remove it)
 app.use(function(req, res) {
