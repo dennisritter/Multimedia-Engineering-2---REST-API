@@ -47,7 +47,17 @@ comments.route('/')
             next(err);
         }
     })
-    .get(methodNotAllowed)
+    .get((res,req,next) => {
+        try {
+            const comments = store.select('comments');
+            res.locals.items = comments;
+            res.status = 200;
+            next();
+        }
+        catch(err){
+            next(err);
+        }
+    })
     .put(methodNotAllowed)
     .delete(methodNotAllowed);
 
