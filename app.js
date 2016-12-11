@@ -59,8 +59,7 @@ app.use(function(req, res) {
     else {
         // otherwise we set status to no-content
         res.set('Content-Type', 'application/json');
-        res.status = 204
-        res.end(); // no content;
+        res.sendStatus(204);
     }
 });
 
