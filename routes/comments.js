@@ -64,15 +64,14 @@ comments.route('/')
 comments.route('/:id')
     .get((req, res, next) => {
         const id = req.params.id;
-        const comment = store.select('comments', id);
-        if (!comment) {
-            const err = new Error(`A comment with id '${id}' does not exist.`);
-            err.status = 404;
-            next(err);
-            return;
+        try{
+            const comment = store.select('comments', id);
+            res.locals.items = comment;
+            next();
         }
-        res.locals.items = comment;
-        next();
+        catch(err){
+            next(err);
+        }
     })
     .put((req,res,next) => {
         let comment = req.body;
