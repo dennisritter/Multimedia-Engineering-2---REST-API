@@ -30,9 +30,7 @@ videos.use(filterParserFactory(Object.keys(allKeys)));
 videos.use(searchParserFactory(allKeys));
 
 const methodNotAllowed = (req, res, next) => {
-    const err = new Error(`Method ${req.method} is not allowed.`);
-    err.status = 405;
-    next(err);
+    return next(new HTTPError(`Method ${req.method} is not allowed.`, 405));
 };
 
 // routes **********************
@@ -51,6 +49,12 @@ videos.route('/')
 
         try {
             data = validateComplete(data);
+            data = Object.assign({
+                description: '',
+                playcount: 0,
+                ranking: 0,
+            }, data);
+
             data.timestamp = new Date().getTime();
 
             // Insert new record
@@ -81,8 +85,13 @@ videos.route('/:id')
     })
     .put(function(req,res,next){
         let data = req.body;
+
         try {
+            const id = validateId(req.params.id);
+            const original = store.select('videos', id);
+
             data = validateComplete(data);
+            data = Object.assign(original, data);
             //replace video with matching id
             store.replace('videos', data.id, data);
             // Send updated record back
@@ -96,11 +105,11 @@ videos.route('/:id')
     })
     .delete(function(req, res, next) {
         try {
-            const id = validateId(id);
+            const id = validateId(req.params.id);
 
             //select all comments
             let comments = store.select('comments');
-            if (Arrays.isArray(comments)) {
+            if (Array.isArray(comments)) {
                 comments.filter(c => c.videoId === id)
                     .forEach((c) => store.remove('comments', c.id));
             }

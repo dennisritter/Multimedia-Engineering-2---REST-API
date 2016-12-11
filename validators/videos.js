@@ -53,13 +53,6 @@ const validateComplete = (data) => {
     }
   }
 
-  // Set default values and timestamp
-  data = Object.assign({
-    description: '',
-    playcount: 0,
-    ranking: 0,
-  }, data);
-
   return data;
 };
 
