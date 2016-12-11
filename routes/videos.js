@@ -16,7 +16,7 @@
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
-const {validateVideo, allKeys} = require('./../validators/videos');
+const {validateComplete, validatePatch, allKeys} = require('./../validators/videos');
 const videoDeleteValidator = require('./../validators/videos-delete');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
@@ -48,7 +48,7 @@ videos.route('/')
         let data = req.body;
 
         try {
-            data = validateVideo(data);
+            data = validateComplete(data);
             // Insert new record
             store.insert('videos', data);
 
@@ -78,7 +78,8 @@ videos.route('/:id')
     .put(function(req,res,next){
         let data = req.body;
         try {
-            data = validateVideo(data);
+            // TODO: make sure id and timestamp are not being updated
+            data = validateComplete(data);
             //replace video with matching id
             store.replace('videos', data.id, data);
             // Send updated record back
@@ -123,43 +124,11 @@ videos.route('/:id')
     })
     .patch((req, res, next) => {
         const original = store.select('videos', req.params.id);
-
-
-        const validKeys = Object.keys(allKeys);
-        // Remove id (you cannot patch id)
-        validKeys.splice(validKeys.indexOf('id'), 1);
         const data = req.body;
 
-        for (let key in data) {
-            if (!data.hasOwnProperty(key)) {
-                continue;
-            }
+        const updated = validatePatch(original, data);
 
-            // Ingore invalid properties
-            if (validKeys.indexOf(key) < 0) {
-                continue;
-            }
-
-            // Custom patch mechanism for playcount
-            if (key === 'playcount') {
-                let value = data[key];
-                if (!value.match(/^(?:\+|-)[0-9]+$/)) {
-                    return next(new HTTPError('playcount must be in the format (+|-)[0-9]+ (e.g. +1, -2)', 400));
-                }
-
-                original.playcount += parseInt(value);
-                continue;
-            }
-
-            // Error, if types of values do not match
-            if (typeof data[key] !== allKeys[key]) {
-                return next(new HTTPError(`Property ${key} must be a ${allKeys[key]} but is a ${typeof data[key]}`, 400));
-            }
-
-            original[key] = data[key];
-        }
-
-        store.replace('videos', original.id, original);
+        store.replace('videos', req.params.id, updated);
         res.locals.items = original;
         next();
     })
