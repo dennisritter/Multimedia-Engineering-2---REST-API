@@ -1,7 +1,7 @@
 const store = require('../blackbox/store');
 const HTTPError = require('./http-error');
 
-const internalKeys = {id: 'number', timestamp: 'string'};
+const {internalKeys} = require('./../validators/videos');
 
 const validateVideoDEL = function(id) {
     "use strict";
