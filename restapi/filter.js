@@ -1,3 +1,5 @@
+const HTTPError = require('./../validators/http-error');
+
 /**
  * Creates a middleware handler parsing the filter params to a filterParams object
  * @param       {array}     availableKeys   Array of available keys of the resource collection
@@ -17,10 +19,7 @@ const filterParserFactory = (availableKeys) => {
             filterParams.filter = req.query.filter.split(',').map(s => s.trim());
             for (let i = 0; i < filterParams.filter.length; ++i) {
                 if (availableKeys.indexOf(filterParams.filter[i]) < 0) {
-                    const err = new Error(`key not valid`);
-                    err.status = 400;
-                    next(err);
-                    return;
+                    return next(new HTTPError(`key ${filterParams.filter[i]} does not exist.`, 400));
                 }
             }
         }
@@ -29,22 +28,15 @@ const filterParserFactory = (availableKeys) => {
         if (req.query.hasOwnProperty('offset')) {
             filterParams.offset = parseInt(req.query.offset);
             if(isNaN(filterParams.offset) || filterParams.offset < 0){
-                const err = new Error(`Offset must be a number >= 0`);
-                err.status = 400;
-                next(err);
-                return;
+                return next(new HTTPError('Offset must be a number >= 0', 400));
             }
-
         }
 
         // Parse and validate limit
         if (req.query.hasOwnProperty('limit')) {
             filterParams.limit = parseInt(req.query.limit);
-            if(isNaN(filterParams.limit) || filterParams.limit <= 0){
-                const err = new Error(`Limit must be a number > 0`);
-                err.status = 400;
-                next(err);
-                return;
+            if(isNaN(filterParams.limit) || filterParams.limit <= 0) {
+                return next(new HTTPError('Limit must be a number > 0', 400));
             }
         }
 
@@ -81,10 +73,7 @@ const filterResponseData = (req, res, next) => {
     // Offset and Limit only for collections
     if (!isSingle) {
         if (filterParams.offset >= data.length && data.length > 0) {
-            const err = new Error(`Offset must not be greater than the number of available items`);
-            err.status = 400;
-            next(err);
-            return;
+            return next(new HTTPError('Offset must not be greater than the number of available items.', 400));
         }
 
         // Calculate start and end index of elements to serve in response and create a new array containing only the desired items

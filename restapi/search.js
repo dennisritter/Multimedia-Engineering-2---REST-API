@@ -1,3 +1,5 @@
+const HTTPError = require('./../validators/http-error');
+
 /**
  * Creates a middleware function parsing and validating the search query
  * @param       {object}    keyMapping      Object mapping available key to type
@@ -16,10 +18,7 @@ const searchParserFactory = (keyMapping) => {
             }
 
             if (!keyMapping.hasOwnProperty(key)) {
-                const err = new Error(`Property ${key} does not exist in this resource`);
-                err.status = 400;
-                next(err);
-                return;
+                return next(new HTTPError(`Property ${key} does not exist in this resource`, 400));
             }
 
             let val = query[key];
@@ -27,10 +26,7 @@ const searchParserFactory = (keyMapping) => {
             if (keyMapping[key] === 'number') {
                 val = parseInt(query[key]);
                 if (isNaN(val)) {
-                    const err = new Error(`Search query for property ${key} must be a number`);
-                    err.status = 400;
-                    next(err);
-                    return;
+                    return next(new HTTPError(`Search query for property ${key} must be a number`, 400));
                 }
             }
 
