@@ -1,3 +1,4 @@
+const store = require('./../blackbox/store');
 const HTTPError = require('./http-error');
 
 // Key mapping
@@ -13,6 +14,8 @@ const allKeys = Object.assign({}, requiredKeys, optionalKeys, internalKeys);
  * @throws      {HTTPError}         If video data is invalid
  */
 const validateComplete = (data) => {
+
+  Object.keys(internalKeys).forEach((key) => delete data[key]);
 
   // Check if required keys present
   for (let key in requiredKeys) {
@@ -55,7 +58,6 @@ const validateComplete = (data) => {
     description: '',
     playcount: 0,
     ranking: 0,
-    timestamp: new Date().getTime()
   }, data);
 
   return data;
@@ -102,4 +104,31 @@ const validatePatch = (original, data) => {
   return original;
 };
 
-module.exports = {validateComplete, validatePatch, requiredKeys, optionalKeys, internalKeys, allKeys};
+/**
+ * Validates and parses a video id
+ * @param       {*}       id        The id to be validated
+ * @returns     {number}            The parsed and validated id
+ * @throws      {HTTPError}         If id is not parsable or a video with the specified id does not exist
+ */
+const validateId = (id) => {
+  // Check for missing id
+  if (!id) {
+    throw new HTTPError('Please send a valid id.', 400);
+  }
+
+  id = parseInt(id, 10);
+
+  // Check for valid id type
+  if (isNaN(id)) {
+    throw new HTTPError(`Property of id must be of type ${internalKeys.id} or a parsable string`, 404);
+  }
+
+  //Check for existing video-id in store
+  if (!store.select('videos', id)) {
+    throw new HTTPError(`An element with ID ${id} does not exist.`, 404);
+  }
+
+  return id;
+};
+
+module.exports = {validateComplete, validatePatch, validateId, requiredKeys, optionalKeys, internalKeys, allKeys};

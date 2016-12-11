@@ -15,11 +15,13 @@
 // modules
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
+
 var store = require('../blackbox/store');
-const {validateComplete, validatePatch, allKeys} = require('./../validators/videos');
-const videoDeleteValidator = require('./../validators/videos-delete');
+
+const {validateComplete, validatePatch, validateId, allKeys} = require('./../validators/videos');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
+
 const HTTPError = require('./../validators/http-error');
 
 var videos = express.Router();
@@ -49,6 +51,8 @@ videos.route('/')
 
         try {
             data = validateComplete(data);
+            data.timestamp = new Date().getTime();
+
             // Insert new record
             store.insert('videos', data);
 
@@ -78,7 +82,6 @@ videos.route('/:id')
     .put(function(req,res,next){
         let data = req.body;
         try {
-            // TODO: make sure id and timestamp are not being updated
             data = validateComplete(data);
             //replace video with matching id
             store.replace('videos', data.id, data);
@@ -92,29 +95,18 @@ videos.route('/:id')
         }
     })
     .delete(function(req, res, next) {
-        let id = req.params.id;
         try {
-            id = videoDeleteValidator(id);
+            const id = validateId(id);
+
             //select all comments
             let comments = store.select('comments');
-            //if there is atleast one comment
-            if(comments){
-                comments.forEach((comment) => {
-                    if(comment.videoid === parseInt(id, 10)){
-                        try{
-                            store.remove('comments', comment.id);
-                        }
-                        catch(err){
-                            next(err);
-                        }
-                    }
-                });
+            if (Arrays.isArray(comments)) {
+                comments.filter(c => c.videoId === id)
+                    .forEach((c) => store.remove('comments', c.id));
             }
 
             // Remove video from store
             store.remove('videos', id);
-            res.status = 200;
-            // Send status without content
             next();
         }
         catch (err) {
