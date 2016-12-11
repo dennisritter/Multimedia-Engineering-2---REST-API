@@ -18,11 +18,11 @@ var logger = require('debug')('me2u4:videos');
 
 var store = require('../blackbox/store');
 
-const {validateComplete, validatePatch, validateId, allKeys} = require('./../validators/videos');
+const {validateComplete, validatePatch, validateId, allKeys} = require('./../validation/videos');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
 
-const HTTPError = require('./../validators/http-error');
+const HTTPError = require('./../validation/http-error');
 
 var videos = express.Router();
 

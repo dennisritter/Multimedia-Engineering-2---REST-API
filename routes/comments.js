@@ -11,10 +11,10 @@
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
-const {validateComment, allKeys} = require('./../validators/comments');
-const {commentsDelete} = require('./../validators/comments-delete');
+const {validateComment, allKeys} = require('./../validation/comments');
+const {commentsDelete} = require('./../validation/comments-delete');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
-const HTTPError = require('./../validators/http-error');
+const HTTPError = require('./../validation/http-error');
 
 var comments = express.Router();
 

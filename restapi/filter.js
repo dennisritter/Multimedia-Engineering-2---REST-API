@@ -1,4 +1,4 @@
-const HTTPError = require('./../validators/http-error');
+const HTTPError = require('./../validation/http-error');
 
 /**
  * Creates a middleware handler parsing the filter params to a filterParams object

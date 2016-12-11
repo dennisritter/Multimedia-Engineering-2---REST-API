@@ -1,7 +1,7 @@
 const store = require('../blackbox/store');
 const HTTPError = require('./http-error');
 
-const {internalKeys} = require('./../validators/comments');
+const {internalKeys} = require('.//comments');
 
 const commentsDelete = function(id) {
     "use strict";

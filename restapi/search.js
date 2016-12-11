@@ -1,4 +1,4 @@
-const HTTPError = require('./../validators/http-error');
+const HTTPError = require('./../validation/http-error');
 
 /**
  * Creates a middleware function parsing and validating the search query

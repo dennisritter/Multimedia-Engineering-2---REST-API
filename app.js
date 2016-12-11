@@ -26,7 +26,7 @@ var {filterParser, filterResponseData} = require('./restapi/filter.js');
 //routes
 var videos = require('./routes/videos');
 var comments = require('./routes/comments');
-const HTTPError = require('./validators/http-error');
+const HTTPError = require('./validation/http-error');
 
 
 
