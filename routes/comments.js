@@ -13,6 +13,7 @@ var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
 const {validateComment, allKeys} = require('./../validators/comments');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
+const HTTPError = require('./../validators/http-error');
 
 var comments = express.Router();
 
@@ -29,10 +30,12 @@ comments.route('/')
     .post((req, res, next) => {
         const videoId = req.body.videoid;
         let comment = req.body;
-
+        // check if video with id:{videoId} exists
+        const video = store.select('videos', videoId);
+        if(!video){
+            return next(new HTTPError(`A video with id ${videoId} does not exist.`, 404));
+        }
         try{
-            // check if video with id:{videoId} exists
-            store.select('videos', videoId);
             comment = validateComment(comment);
             store.insert('comments', comment);
             res.locals.items = comment;
@@ -40,22 +43,16 @@ comments.route('/')
             next();
         }
         catch(err){
-            const err = new Error(`A video with id ${videoId} does not exist.`);
-            err.status = 404;
             next(err);
-            return;
         }
     })
+    //NOTE: Always Throws Error -> 'Cannot set property 'items' of undefined'
+    //why?!
     .get((res,req,next) => {
-        try {
-            const comments = store.select('comments');
-            res.locals.items = comments;
-            res.status = 200;
-            next();
-        }
-        catch(err){
-            next(err);
-        }
+        const comments = store.select('comments');
+        res.locals.items = comments;
+        res.status = 200;
+        next();
     })
     .put(methodNotAllowed)
     .delete(methodNotAllowed);
@@ -63,14 +60,13 @@ comments.route('/')
 comments.route('/:id')
     .get((req, res, next) => {
         const id = req.params.id;
-        try{
-            const comment = store.select('comments', id);
-            res.locals.items = comment;
-            next();
+        const comment = store.select('comments');
+        if(!comment){
+            return next(new HTTPError(`A comment with id ${id} does not exist.`, 404));
         }
-        catch(err){
-            next(err);
-        }
+        res.locals.items = comment;
+        res.status = 200;
+        next();
     })
     .put((req,res,next) => {
         let comment = req.body;
@@ -101,26 +97,28 @@ comments.route('/:id')
 comments.route('/videos/:videoid')
     .get((req,res,next) => {
         const videoId = req.params.videoid;
-        try{
-            // check if video with id:{videoId} exists
-            store.select('videos', videoId);
-            let comments = store.select('comments');
-            if(comments.length > 0) {
-                comments.filter((comment) => comment.videoid === parseInt(videoId, 10));
-            }
-            res.locals.items = comments;
-            res.status = 200;
-            next();
+        const video = store.select('videos', videoId);
+
+        // check if video with id:{videoId} exists
+        if(!video){
+            return next(new HTTPError(`A video with id ${videoId} does not exist.`, 404));
         }
-        catch(err){
-            next(err);
+        let comments = store.select('comments');
+        if(comments.length > 0) {
+            comments.filter((comment) => comment.videoid === parseInt(videoId, 10));
         }
+        res.locals.items = comments;
+        res.status = 200;
+        next();
     })
     .delete((req,res,next) => {
         const videoId = req.params.videoid;
+        // check if video with id:{videoId} exists
+        const video = store.select('videos', videoId);
+        if(!video){
+            return next(new HTTPError(`A video with id ${videoId} does not exist.`, 404));
+        }
         try{
-            // check if video with id:{videoId} exists
-            store.select('videos', videoId);
             let comments = store.select('comments');
             comments.forEach((comment) => {
                 if(comment.videoid === parseInt(videoId, 10)){
