@@ -12,6 +12,7 @@ var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
 const {validateComment, allKeys} = require('./../validators/comments');
+const {commentsDelete} = require('./../validators/comments-delete');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 const HTTPError = require('./../validators/http-error');
 
@@ -80,8 +81,10 @@ comments.route('/:id')
         }
     })
     .delete((req,res,next) => {
-        const id = req.params.id;
+        let id = req.params.id;
         try{
+            //validate id
+            id = commentsDelete(id);
             store.remove('comments', id);
             res.status = 200;
             next();
@@ -120,6 +123,7 @@ comments.route('/videos/:videoid')
             let comments = store.select('comments');
             comments.forEach((comment) => {
                 if(comment.videoid === parseInt(videoId, 10)){
+                    let id = commentsDelete(comment.id);
                     store.remove('comments', comment.id);
                     res.status = 200;
                     next();
