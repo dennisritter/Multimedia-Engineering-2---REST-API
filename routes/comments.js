@@ -26,8 +26,6 @@ const methodNotAllowed = (req, res, next) => {
 
 // routes **********************
 comments.route('/')
-    .get(methodNotAllowed)
-    .put(methodNotAllowed)
     .post((req, res, next) => {
         const videoId = req.body.videoid;
         let comment = req.body;
@@ -48,7 +46,10 @@ comments.route('/')
         catch(err){
             next(err);
         }
-    });
+    })
+    .get(methodNotAllowed)
+    .put(methodNotAllowed)
+    .delete(methodNotAllowed);
 
 comments.route('/:id')
     .get((req, res, next) => {
@@ -86,7 +87,8 @@ comments.route('/:id')
         catch(err){
             next(err);
         }
-    });
+    })
+    .post(methodNotAllowed);
 
 comments.route('/videos/:videoid')
     .get((req,res,next) => {
@@ -129,7 +131,9 @@ comments.route('/videos/:videoid')
                 }
             }
         });
-    });
+    })
+    .post(methodNotAllowed)
+    .put(methodNotAllowed);
 
 comments.use(filterResponseData);
 
