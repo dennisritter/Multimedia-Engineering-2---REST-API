@@ -3,6 +3,7 @@ const axios = require('axios');
 const videoUrl = 'http://localhost:3000/videos';
 
 const data = [
+    //VIDEOS
     {
         title: "404, the story of a page not found",
         src: "http://download.ted.com/talks/RennyGleeson_2012U-480p.mp4?apikey=489b859150fc58263f17110eeb44ed5fba4a3b22",
@@ -39,6 +40,20 @@ const data = [
         length: 17*60+1,
         playcount: 1843221,
         ranking: 100
+    },
+
+    //COMMENTS
+    {
+        videoId: 101,
+        text: "I Like turtles."
+    },
+    {
+        videoId: 101,
+        text: "1 comment für 1 wunnderbahren filn."
+    },
+    {
+        videoId: 101,
+        text: "...und Form!"
     }
 ];
 
