@@ -30,13 +30,9 @@ comments.route('/')
         const videoId = req.body.videoid;
         let comment = req.body;
 
-        if(!store.select('videos', videoId)){
-            const err = new Error(`A video with id ${videoId} does not exist.`);
-            err.status = 404;
-            next(err);
-            return;
-        }
-        try {
+        try{
+            // check if video with id:{videoId} exists
+            store.select('videos', videoId);
             comment = validateComment(comment);
             store.insert('comments', comment);
             res.locals.items = comment;
@@ -44,7 +40,10 @@ comments.route('/')
             next();
         }
         catch(err){
+            const err = new Error(`A video with id ${videoId} does not exist.`);
+            err.status = 404;
             next(err);
+            return;
         }
     })
     .get((res,req,next) => {
@@ -102,44 +101,38 @@ comments.route('/:id')
 comments.route('/videos/:videoid')
     .get((req,res,next) => {
         const videoId = req.params.videoid;
-        const video = store.select('videos', videoId);
-        if(!video){
-            const err = new Error(`A video with id ${videoId} does not exist.`);
-            err.status = 404;
-            next(err);
-            return;
-        }
-        let comments = store.select('comments');
-        if(comments.length > 0) {
-            comments.filter((comment) => {
-                return comment.videoid === parseInt(videoId, 10);
-            });
+        try{
+            // check if video with id:{videoId} exists
+            store.select('videos', videoId);
+            let comments = store.select('comments');
+            if(comments.length > 0) {
+                comments.filter((comment) => comment.videoid === parseInt(videoId, 10));
+            }
             res.locals.items = comments;
             res.status = 200;
             next();
         }
+        catch(err){
+            next(err);
+        }
     })
     .delete((req,res,next) => {
         const videoId = req.params.videoid;
-        const video = store.select('videos', videoId);
-        if(!video){
-            const err = new Error(`A video with id ${videoId} does not exist.`);
-            err.status = 404;
-            next(err);
-            return;
-        }
-        let comments = store.select('comments').forEach((comment) => {
-            if(comment.videoid === parseInt(videoId, 10)){
-                try{
+        try{
+            // check if video with id:{videoId} exists
+            store.select('videos', videoId);
+            let comments = store.select('comments');
+            comments.forEach((comment) => {
+                if(comment.videoid === parseInt(videoId, 10)){
                     store.remove('comments', comment.id);
                     res.status = 200;
                     next();
                 }
-                catch(err){
-                    next(err);
-                }
-            }
-        });
+            });
+        }
+        catch(err){
+            next(err);
+        }
     })
     .post(methodNotAllowed)
     .put(methodNotAllowed);
