@@ -79,4 +79,4 @@ const createValidateId = (resourceCollection) => {
   };
 };
 
-module.exports = {createValidateComplete, createValidateId};
+module.exports = {createValidateComplete, createValidateId, HTTPError};
