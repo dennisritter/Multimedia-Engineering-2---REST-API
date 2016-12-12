@@ -1,5 +1,4 @@
-const {createValidateComplete, createValidateId} = require('./common');
-const HTTPError = require('./../validation/http-error');
+const {createValidateComplete, createValidateId, HTTPError} = require('./common');
 
 // Key mapping
 const requiredKeys = {title: 'string', src: 'string', length: 'number'};
