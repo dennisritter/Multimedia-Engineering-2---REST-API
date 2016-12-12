@@ -53,9 +53,11 @@ comments.route('/')
         }
     })
     .get((req, res, next) => {
-        const comment = store.select('comments');
-        res.locals.items = comment;
-        res.status = 200;
+        const comments = store.select('comments');
+        if(comments){
+            res.status = 200;
+            res.locals.items = comments;
+        }
         next();
     })
     .put(methodNotAllowed)
