@@ -11,8 +11,7 @@
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
 var store = require('../blackbox/store');
-const {validateComment, allKeys} = require('./../validation/comments');
-const {commentsDelete} = require('./../validation/comments-delete');
+const {validateComplete, validateId, allKeys} = require('./../validation/comments');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 const HTTPError = require('./../validation/http-error');
 
@@ -37,7 +36,7 @@ comments.route('/')
             return next(new HTTPError(`A video with id ${videoId} does not exist.`, 404));
         }
         try{
-            comment = validateComment(comment);
+            comment = validateComplete(comment);
             store.insert('comments', comment);
             res.locals.items = comment;
             res.status = 201;
@@ -70,7 +69,7 @@ comments.route('/:id')
     .put((req,res,next) => {
         let comment = req.body;
         try {
-            comment = validateComment(comment);
+            comment = validateComplete(comment);
             store.replace('comments', comment.id, comment);
             res.locals.items = comment;
             res.status = 200;
@@ -84,7 +83,7 @@ comments.route('/:id')
         let id = req.params.id;
         try{
             //validate id
-            id = commentsDelete(id);
+            id = validateId(id);
             store.remove('comments', id);
             res.status = 200;
             next();
@@ -123,8 +122,8 @@ comments.route('/videos/:videoid')
             let comments = store.select('comments');
             comments.forEach((comment) => {
                 if(comment.videoid === parseInt(videoId, 10)){
-                    let id = commentsDelete(comment.id);
-                    store.remove('comments', comment.id);
+                    let id = validateId(comment.id);
+                    store.remove('comments', id);
                     res.status = 200;
                     next();
                 }
