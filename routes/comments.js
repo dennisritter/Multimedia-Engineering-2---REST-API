@@ -37,6 +37,12 @@ comments.route('/')
         }
         try{
             comment = validateComplete(comment);
+            comment = Object.assign({
+                likes: 0,
+                dislikes: 0
+            }, comment);
+            comment.timestamp = new Date().getTime();
+
             store.insert('comments', comment);
             res.locals.items = comment;
             res.status = 201;
@@ -80,12 +86,10 @@ comments.route('/:id')
         }
     })
     .delete((req,res,next) => {
-        let id = req.params.id;
         try{
             //validate id
-            id = validateId(id);
+            const id = validateId(req.params.id);
             store.remove('comments', id);
-            res.status = 200;
             next();
         }
         catch(err){
@@ -104,11 +108,11 @@ comments.route('/videos/:videoid')
             return next(new HTTPError(`A video with id ${videoId} does not exist.`, 404));
         }
         let comments = store.select('comments');
-        if(comments.length > 0) {
+        if(comments) {
             comments.filter((comment) => comment.videoid === parseInt(videoId, 10));
+            res.locals.items = comments;
+            res.status = 200;
         }
-        res.locals.items = comments;
-        res.status = 200;
         next();
     })
     .delete((req,res,next) => {
@@ -120,14 +124,15 @@ comments.route('/videos/:videoid')
         }
         try{
             let comments = store.select('comments');
-            comments.forEach((comment) => {
-                if(comment.videoid === parseInt(videoId, 10)){
-                    let id = validateId(comment.id);
-                    store.remove('comments', id);
-                    res.status = 200;
-                    next();
-                }
-            });
+            if(comments){
+                comments.forEach((comment) => {
+                    if(comment.videoid === parseInt(videoId, 10)){
+                        let id = validateId(comment.id);
+                        store.remove('comments', id);
+                    }
+                });
+            }
+            next();
         }
         catch(err){
             next(err);
