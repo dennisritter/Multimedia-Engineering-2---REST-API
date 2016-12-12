@@ -59,7 +59,8 @@ comments.route('/')
         next();
     })
     .put(methodNotAllowed)
-    .delete(methodNotAllowed);
+    .delete(methodNotAllowed)
+    .patch(methodNotAllowed);
 
 comments.route('/:id')
     .get((req, res, next) => {
@@ -96,7 +97,8 @@ comments.route('/:id')
             next(err);
         }
     })
-    .post(methodNotAllowed);
+    .post(methodNotAllowed)
+    .patch(methodNotAllowed);
 
 comments.route('/videos/:videoid')
     .get((req,res,next) => {
@@ -143,6 +145,7 @@ comments.route('/videos/:videoid')
         }
     })
     .post(methodNotAllowed)
+    .patch(methodNotAllowed)
     .put(methodNotAllowed);
 
 comments.use(filterResponseData);
