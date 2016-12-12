@@ -1,3 +1,12 @@
+/** This module defines all Keys for comment Objects and
+ *  exports validators for comment-Ids and the comment model based on those keys.
+ *
+ * @author Dennis Ritter
+ *
+ * @module routes/comments
+ * @type {Router}
+ */
+
 // import validation factories
 const {createValidateComplete, createValidateId} = require('./common');
 

@@ -6,8 +6,10 @@ const optionalKeys = {description: 'string', playcount: 'number', ranking: 'numb
 const internalKeys = {id: 'number', timestamp: 'number'};
 const allKeys = Object.assign({}, requiredKeys, optionalKeys, internalKeys);
 
+// Create a video validator using the createValidateComplete factory
 const validateComplete = createValidateComplete(requiredKeys, internalKeys, allKeys);
 
+// Create a video id validator using the createValidateId factory
 const validateId = createValidateId('videos');
 
 /**
