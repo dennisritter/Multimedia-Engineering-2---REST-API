@@ -12,4 +12,4 @@ const validateComplete = createValidateComplete(requiredKeys, internalKeys, allK
 const validateId = createValidateId('comments');
 
 // export comment validators and keys
-module.exports = {validateComplete, requiredKeys, optionalKeys, internalKeys, allKeys};
+module.exports = {validateComplete, validateId, requiredKeys, optionalKeys, internalKeys, allKeys};
