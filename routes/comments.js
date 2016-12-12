@@ -109,11 +109,15 @@ comments.route('/videos/:videoid')
         }
         let comments = store.select('comments');
         if(comments) {
-            comments.filter((comment) => comment.videoid === parseInt(videoId, 10));
-            res.locals.items = comments;
-            res.status = 200;
+            comments = comments.filter((comment) => comment.videoid === parseInt(videoId, 10));
+            if (comments.length < 1){
+                next();
+            }else {
+                res.locals.items = comments;
+                res.status = 200;
+                next();
+            }
         }
-        next();
     })
     .delete((req,res,next) => {
         const videoId = req.params.videoid;
