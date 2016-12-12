@@ -1,4 +1,5 @@
 const {createValidateComplete, createValidateId} = require('./common');
+const HTTPError = require('./../validation/http-error');
 
 // Key mapping
 const requiredKeys = {title: 'string', src: 'string', length: 'number'};
@@ -34,6 +35,9 @@ const validatePatch = (original, data) => {
         // Custom patch mechanism for playcount
         if (key === 'playcount') {
             let value = data[key];
+            if (typeof value !== 'string'){
+                throw new HTTPError('playcount PATCH must be of type String', 400);
+            }
             if (!value.match(/^(?:\+|-)[0-9]+$/)) {
                 throw new HTTPError('playcount must be in the format (+|-)[0-9]+ (e.g. +1, -2)', 400);
             }
