@@ -49,7 +49,11 @@ app.use('/videos', videos);
 app.use('/comments', comments);
 
 // this middleware function can be used, if you like (or remove it)
-app.use(function(req, res) {
+app.use(function(req, res, next) {
+    //check if requested route has been matched
+    if(!req.route){
+        next();
+    }
     // if anything to send has been added to res.locals.items
     if (res.locals.items) {
         // then we send it as json and remove it
