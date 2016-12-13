@@ -134,6 +134,54 @@ videos.route('/:id')
     })
     .post(methodNotAllowed);
 
+
+videos.route('/:id/comments')
+    .get((req,res,next) => {
+        const videoId = req.params.id;
+        const video = store.select('videos', videoId);
+
+        // check if video with id:{videoId} exists
+        if(!video){
+            return next(new HTTPError(`A video with id ${videoId} does not exist.`, 404));
+        }
+        let comments = store.select('comments');
+        if(comments) {
+            comments = comments.filter((comment) => comment.videoid === parseInt(videoId, 10));
+            if (comments.length < 1){
+                next();
+            }else {
+                res.locals.items = comments;
+                res.status = 200;
+                next();
+            }
+        }
+    })
+    .delete((req,res,next) => {
+        const videoId = req.params.id;
+        // check if video with id:{videoId} exists
+        const video = store.select('videos', videoId);
+        if(!video){
+            return next(new HTTPError(`A video with id ${videoId} does not exist.`, 404));
+        }
+        try{
+            let comments = store.select('comments');
+            if(comments){
+                comments.forEach((comment) => {
+                    if(comment.videoid === parseInt(videoId, 10)){
+                        let id = validateId(comment.id);
+                        store.remove('comments', id);
+                    }
+                });
+            }
+            next();
+        }
+        catch(err){
+            next(err);
+        }
+    })
+    .post(methodNotAllowed)
+    .patch(methodNotAllowed)
+    .put(methodNotAllowed);
 videos.use(searchResponseFilterFactory(allKeys));
 videos.use(filterResponseData);
 
