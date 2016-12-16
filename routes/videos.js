@@ -6,6 +6,7 @@
  * @module routes/videos
  * @type {Router}
  */
+"use strict";
 
 // remember: in modules you have 3 variables given by CommonJS
 // 1.) require() function
@@ -16,15 +17,23 @@
 var express = require('express');
 var logger = require('debug')('me2u4:videos');
 
-var store = require('../blackbox/store');
+//load mongoose module
+const mongoose = require('mongoose');
 
+//remove?
 const {validateComplete, validatePatch, validateId, allKeys} = require('./../validation/videos');
 const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
 const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
 
+//load mongoose VideoModel
+var VideoModel = require('./../models/video');
+//load HTTPError constructor
 const HTTPError = require('./../validation/http-error');
 
 var videos = express.Router();
+
+//connect to mongoDB
+const db = mongoose.connect('mongodb://localhost:27017/me2');
 
 videos.use(filterParserFactory(Object.keys(allKeys)));
 videos.use(searchParserFactory(allKeys));
@@ -45,29 +54,13 @@ videos.route('/')
         }
     })
     .post(function(req, res, next) {
-        let data = req.body;
-
-        try {
-            data = validateComplete(data);
-            data = Object.assign({
-                description: '',
-                playcount: 0,
-                ranking: 0,
-            }, data);
-
-            data.timestamp = new Date().getTime();
-
-            // Insert new record
-            store.insert('videos', data);
-
-            // Send new record back
-            res.locals.items = data;
-            res.status(201);
-            next();
-        }
-        catch (err) {
-            next(err);
-        }
+        var video = new VideoModel(req.body)
+        video.save((err) => {
+            if(err){
+                return next(new HTTPError(err.message, 400));
+            }
+            res.status(201).json(video);
+        });
     })
     .put(methodNotAllowed)
     .patch(methodNotAllowed)
