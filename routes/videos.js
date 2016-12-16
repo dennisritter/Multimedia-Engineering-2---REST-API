@@ -51,14 +51,6 @@ videos.route('/')
             }
             res.status(200).json(items);
         })
-
-        // const videos = store.select('videos');
-        // if (videos === undefined) {
-        //     next();
-        // } else {
-        //     res.locals.items = videos;
-        //     next();
-        // }
     })
     .post(function(req, res, next) {
         var video = new VideoModel(req.body)
