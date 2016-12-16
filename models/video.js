@@ -18,13 +18,9 @@ const VideoSchema = new Schema({
    timestamps: {createdAt: 'timestamp'}
 });
 
-module.export = mongoose.model('Video', VideoSchema);
+module.exports = mongoose.model('Video', VideoSchema);
 
-// _id (String, von Außen nicht setzbar, automatisch bei POST)
-//  title (String, required)
-//  description (String, optional, default '' [leerer String])
-//  src (String, required)
-//  length (Number; nicht negative Zahl für Sekundenangabe, required)
-//  timestamp (String, nicht von Außen setzbar, automatisch bei POST)
-//  playcount (Number; nicht negative Zahl, optional, default 0)
-//  ranking (Number; nicht negative Zahl, optional, default 0)
+
+
+
+
