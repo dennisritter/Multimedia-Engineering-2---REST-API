@@ -8,7 +8,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development DEBUG=me2u4:* node app.js",
     "test": "mocha",
-    "test-data": "node insert-test-data.js"
+    "test-data": "node insert-test-data.js",
+    "mongo": "mongod --dbpath ./mongodb-data"
   },
   "dependencies": {
     "axios": "^0.15.3",
