@@ -67,13 +67,12 @@ videos.route('/')
 
 videos.route('/:id')
     .get((req, res, next) => {
-        const video = store.select('videos', req.params.id);
-        if (!video) {
-            return next(new HTTPError(`A video with id ${req.params.id} does not exist.`, 404));
-        }
-
-        res.locals.items = video;
-        next();
+        VideoModel.findById(req.params.id, (err, item) => {
+            if(err){
+                return next(new HTTPError(err.message, 404));
+            }
+            res.status(200).json(item);
+        })
     })
     .put(function(req,res,next){
         let data = req.body;
@@ -96,23 +95,31 @@ videos.route('/:id')
         }
     })
     .delete(function(req, res, next) {
-        try {
-            const id = validateId(req.params.id);
-
-            //select all comments
-            let comments = store.select('comments');
-            if (Array.isArray(comments)) {
-                comments.filter(c => c.videoId === id)
-                    .forEach((c) => store.remove('comments', c.id));
+        VideoModel.findByIdAndRemove(req.params.id, (err, item) => {
+            if(err){
+                return next(new HTTPError(err.message, 404));
             }
-
-            // Remove video from store
-            store.remove('videos', id);
+            // If ID does not exist no error thrown.
+            // --> also check for if ID exists?
             next();
-        }
-        catch (err) {
-            next(err);
-        }
+        })
+        // try {
+        //     const id = validateId(req.params.id);
+        //
+        //     //select all comments
+        //     let comments = store.select('comments');
+        //     if (Array.isArray(comments)) {
+        //         comments.filter(c => c.videoId === id)
+        //             .forEach((c) => store.remove('comments', c.id));
+        //     }
+        //
+        //     // Remove video from store
+        //     store.remove('videos', id);
+        //     next();
+        // }
+        // catch (err) {
+        //     next(err);
+        // }
     })
     .patch((req, res, next) => {
         const original = store.select('videos', req.params.id);
