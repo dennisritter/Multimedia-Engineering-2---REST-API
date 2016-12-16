@@ -103,33 +103,25 @@ videos.route('/:id')
             // --> also check for if ID exists?
             next();
         })
-        // try {
-        //     const id = validateId(req.params.id);
-        //
-        //     //select all comments
-        //     let comments = store.select('comments');
-        //     if (Array.isArray(comments)) {
-        //         comments.filter(c => c.videoId === id)
-        //             .forEach((c) => store.remove('comments', c.id));
-        //     }
-        //
-        //     // Remove video from store
-        //     store.remove('videos', id);
-        //     next();
-        // }
-        // catch (err) {
-        //     next(err);
-        // }
     })
     .patch((req, res, next) => {
-        const original = store.select('videos', req.params.id);
-        const data = req.body;
-
-        const updated = validatePatch(original, data);
-
-        store.replace('videos', req.params.id, updated);
-        res.locals.items = original;
-        next();
+        if(req.body._id && (req.params.id !== req.body._id)){
+            return next(new HTTPError('The _id sent in body is invalid.'));
+        }
+        VideoModel.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true}, (err, item) => {
+            if(err){
+                return next(new HTTPError(err.message, 404));
+            }
+            res.status(200).json(item);
+        })
+        // const original = store.select('videos', req.params.id);
+        // const data = req.body;
+        //
+        // const updated = validatePatch(original, data);
+        //
+        // store.replace('videos', req.params.id, updated);
+        // res.locals.items = original;
+        // next();
     })
     .post(methodNotAllowed);
 
