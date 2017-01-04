@@ -13,6 +13,9 @@
  */
 "use strict";
 
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -21,14 +24,18 @@ var requestLogger = require('morgan');
 var debug = require('debug')('me2u4:server');
 
 // own modules
+
 var restAPIchecks = require('./restapi/request-checks.js');
-var {filterParser, filterResponseData} = require('./restapi/filter.js');
 //routes
 var videos = require('./routes/videos');
 var comments = require('./routes/comments');
 const HTTPError = require('./validation/http-error');
 
-
+// Create MongoDB connection - commands will be buffered until connection is established
+dotenv.config();
+const {MONGODB_HOST, MONGODB_PORT, MONGODB_DBNAME} = process.env;
+mongoose.connect(`mongodb://${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DBNAME}`);
+mongoose.connection.on('open', () => debug(`Connection to MongoDB ${MONGODB_DBNAME} on ${MONGODB_HOST}:${MONGODB_PORT} established.`));
 
 // app creation
 var app = express();

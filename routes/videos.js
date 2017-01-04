@@ -32,9 +32,6 @@ const HTTPError = require('./../validation/http-error');
 
 var videos = express.Router();
 
-//connect to mongoDB
-const db = mongoose.connect('mongodb://localhost:27017/me2');
-
 videos.use(filterParserFactory(Object.keys(allKeys)));
 videos.use(searchParserFactory(allKeys));
 

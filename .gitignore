@@ -1,3 +1,5 @@
 .idea/*
 node_modules
 mongodb-data
+npm-debug.log
+.env
