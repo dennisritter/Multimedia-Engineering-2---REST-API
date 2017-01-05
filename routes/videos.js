@@ -74,22 +74,29 @@ videos.route('/:id')
     .put(function(req,res,next){
         let data = req.body;
 
-        try {
-            const id = validateId(req.params.id);
-            const original = store.select('videos', id);
+        const video = new VideoModel(data);
+        video.validate((err) => {
+            if (err) {
+                return next(new HTTPError(err.message, 422));
+            }
 
-            data = validateComplete(data);
-            data = Object.assign(original, data);
-            //replace video with matching id
-            store.replace('videos', data.id, data);
-            // Send updated record back
-            res.locals.items = data;
-            res.status(200);
-            next();
-        }
-        catch(err){
-            next(err);
-        }
+            const videoObject = video.toObject();
+            delete videoObject._id;
+            delete videoObject.__v;
+
+            VideoModel.findOneAndUpdate({_id: req.params.id}, {$set: videoObject}, {
+                new: true,
+                setDefaultsOnInsert: true
+            }, (err, item) => {
+                if (err) {
+                    return next(new HTTPError(err.message, 500));
+                }
+
+                res.status(200).json(item);
+            });
+        });
+
+
     })
     .delete(function(req, res, next) {
         VideoModel.findByIdAndRemove(req.params.id, (err, item) => {
