@@ -28,7 +28,6 @@ var debug = require('debug')('me2u4:server');
 var restAPIchecks = require('./restapi/request-checks.js');
 //routes
 var videos = require('./routes/videos');
-var comments = require('./routes/comments');
 const HTTPError = require('./validation/http-error');
 
 // Create MongoDB connection - commands will be buffered until connection is established
@@ -53,7 +52,6 @@ app.use(restAPIchecks);
 
 // Routes ******************************************************
 app.use('/videos', videos);
-app.use('/comments', comments);
 
 // this middleware function can be used, if you like (or remove it)
 app.use(function(req, res, next) {
