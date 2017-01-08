@@ -43,7 +43,8 @@ const methodNotAllowed = (req, res, next) => {
 // routes **********************
 videos.route('/')
     .get(function(req, res, next) {
-        VideoModel.find({}, (err, items) => {
+
+        VideoModel.find({}, res.locals.filterParams.filter, {limit: res.locals.filterParams.limit, skip: res.locals.filterParams.offset},(err, items) => {
             if (err) {
                 // Any error here must be related to internal error reasons
                 return next(new HTTPError('Internal Server Error', 500));
@@ -68,7 +69,8 @@ videos.route('/')
 
 videos.route('/:id')
     .get((req, res, next) => {
-        VideoModel.findById(req.params.id, (err, item) => {
+
+        VideoModel.findById(req.params.id, res.locals.filterParams.filter, (err, item) => {
             if (!item) {
                 return next(new HTTPError('Resource does not exist.', 404));
             }
