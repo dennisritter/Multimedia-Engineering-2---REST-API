@@ -5,17 +5,43 @@
  */
 
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 const VideoSchema = new Schema({
-    title: {type: String, required: true},
-    description: {type: String, required: false, default: ""},
-    src: {type: String, required: true},
-    length: {type: Number, required: true, min: 0},
-    playcount: {type: Number, required: false, min: 0, default: 0},
-    ranking: {type: Number, required: false, min: 0, default: 0}
+    title: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    src: {
+        type: String,
+        required: true
+    },
+    length: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    playcount: {
+        type: Number,
+        required: false,
+        min: 0,
+        default: 0
+    },
+    ranking: {
+        type: Number,
+        required: false,
+        min: 0,
+        default: 0
+    }
 }, {
-   timestamps: {createdAt: 'timestamp'}
+   timestamps: {
+       createdAt: 'timestamp'
+   }
 });
 
 module.exports = mongoose.model('Video', VideoSchema);

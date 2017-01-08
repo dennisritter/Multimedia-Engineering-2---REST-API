@@ -29,6 +29,7 @@ const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi
 var VideoModel = require('./../models/video');
 //load HTTPError constructor
 const HTTPError = require('./../validation/http-error');
+const MongooseValidationError = require('./../validation/mongoose-validation-error');
 
 var videos = express.Router();
 
@@ -43,18 +44,21 @@ const methodNotAllowed = (req, res, next) => {
 videos.route('/')
     .get(function(req, res, next) {
         VideoModel.find({}, (err, items) => {
-            if(err){
-                return next(new HTTPError(err.message, 404));
+            if (err) {
+                // Any error here must be related to internal error reasons
+                return next(new HTTPError('Internal Server Error', 500));
             }
+
             res.status(200).json(items);
         })
     })
     .post(function(req, res, next) {
-        var video = new VideoModel(req.body)
+        const video = new VideoModel(req.body);
         video.save((err) => {
-            if(err){
-                return next(new HTTPError(err.message, 400));
+            if (err) {
+                return next(new MongooseValidationError(err));
             }
+
             res.status(201).json(video);
         });
     })
@@ -65,25 +69,37 @@ videos.route('/')
 videos.route('/:id')
     .get((req, res, next) => {
         VideoModel.findById(req.params.id, (err, item) => {
-            if(err){
-                return next(new HTTPError(err.message, 404));
+            if (!item) {
+                return next(new HTTPError('Resource does not exist.', 404));
             }
+
+            if (err) {
+                // Any error here must be related to internal error reasons
+                return next(new HTTPError(err.message, 500));
+            }
+
             res.status(200).json(item);
         })
     })
-    .put(function(req,res,next){
-        let data = req.body;
+    .put((req,res,next) => {
+        const data = req.body;
 
+        // Treat put data as completely new record
         const video = new VideoModel(data);
+        // Validate new record
         video.validate((err) => {
             if (err) {
-                return next(new HTTPError(err.message, 422));
+                return next(new HTTPError(err.message, 400));
             }
 
+            // Create plain object with model data
             const videoObject = video.toObject();
+
+            // Delete id and version from updates (avoid change of id and version)
             delete videoObject._id;
             delete videoObject.__v;
 
+            // Replace old record with new record
             VideoModel.findOneAndUpdate({_id: req.params.id}, {$set: videoObject}, {
                 new: true,
                 setDefaultsOnInsert: true
@@ -92,6 +108,7 @@ videos.route('/:id')
                     return next(new HTTPError(err.message, 500));
                 }
 
+                // Respond with new record data
                 res.status(200).json(item);
             });
         });
@@ -100,24 +117,27 @@ videos.route('/:id')
     })
     .delete(function(req, res, next) {
         VideoModel.findByIdAndRemove(req.params.id, (err, item) => {
-            if(err){
-                return next(new HTTPError(err.message, 404));
+            if (err) {
+                return next(new HTTPError(err.message, 500));
             }
-            // If ID does not exist no error thrown.
-            // --> also check for if ID exists?
+
+            if (!item) {
+                return next(new HTTPError('Resource does not exist', 404));
+            }
+
             next();
         })
     })
     .patch((req, res, next) => {
         if(req.body._id && (req.params.id !== req.body._id)){
-            return next(new HTTPError('The _id sent in body is invalid.'));
+            return next(new HTTPError('The _id sent in body is invalid.', 400));
         }
         VideoModel.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true}, (err, item) => {
             if(err){
                 return next(new HTTPError(err.message, 404));
             }
             res.status(200).json(item);
-        })
+        });
         // const original = store.select('videos', req.params.id);
         // const data = req.body;
         //
