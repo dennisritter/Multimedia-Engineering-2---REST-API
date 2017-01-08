@@ -45,44 +45,4 @@ const filterParserFactory = (availableKeys) => {
     };
 };
 
-/**
- * Middleware actually filtering the response data according to the filterParams
- * @inheritDoc
- */
-const filterResponseData = (req, res, next) => {
-    if (!res.locals.items) {
-        next();
-        return;
-    }
-
-    const filterParams = res.locals.filterParams;
-    let data = res.locals.items;
-    const isSingle = !Array.isArray(data);
-
-    // Filter
-    if (filterParams.filter && filterParams.filter.length > 0) {
-        const filterObject = (obj) => {
-            const newItem = {};
-            filterParams.filter.forEach(key => newItem[key] = obj[key]);
-            return newItem;
-        };
-
-        data = isSingle ? filterObject(data) : data.map(filterObject);
-    }
-
-    // Offset and Limit only for collections
-    if (!isSingle) {
-        if (filterParams.offset >= data.length && data.length > 0) {
-            return next(new HTTPError('Offset must not be greater than the number of available items.', 400));
-        }
-
-        // Calculate start and end index of elements to serve in response and create a new array containing only the desired items
-        const limit = filterParams.limit > -1 ? filterParams.offset + filterParams.limit : data.length;
-        data = data.slice(filterParams.offset, limit);
-    }
-
-    res.locals.items = data;
-    next();
-};
-
-module.exports = {filterParserFactory, filterResponseData};
+module.exports = {filterParserFactory};

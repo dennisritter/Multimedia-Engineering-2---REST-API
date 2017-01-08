@@ -22,7 +22,7 @@ const mongoose = require('mongoose');
 
 //remove?
 const {validateComplete, validatePatch, validateId, allKeys} = require('./../validation/videos');
-const {filterParserFactory, filterResponseData} = require('./../restapi/filter');
+const {filterParserFactory} = require('./../restapi/filter');
 const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
 
 //load mongoose VideoModel
@@ -140,8 +140,5 @@ videos.route('/:id')
         });
     })
     .post(methodNotAllowed);
-
-videos.use(searchResponseFilterFactory(allKeys));
-videos.use(filterResponseData);
 
 module.exports = videos;
