@@ -11,7 +11,7 @@ const filterParserFactory = (availableKeys) => {
         const filterParams = {
             filter: "",
             offset: 0,
-            limit: -1
+            limit: 0
         };
 
         if (req.query.hasOwnProperty('filter')) {
