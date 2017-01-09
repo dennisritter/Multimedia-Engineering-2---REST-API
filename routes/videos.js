@@ -23,7 +23,6 @@ const mongoose = require('mongoose');
 //remove?
 const {validateComplete, validatePatch, validateId, allKeys} = require('./../validation/videos');
 const {filterParserFactory} = require('./../restapi/filter');
-const {searchParserFactory, searchResponseFilterFactory} = require('./../restapi/search');
 
 //load mongoose VideoModel
 var VideoModel = require('./../models/video');
@@ -34,7 +33,6 @@ const MongooseValidationError = require('./../validation/mongoose-validation-err
 var videos = express.Router();
 
 videos.use(filterParserFactory(Object.keys(allKeys)));
-videos.use(searchParserFactory(allKeys));
 
 const methodNotAllowed = (req, res, next) => {
     return next(new HTTPError(`Method ${req.method} is not allowed.`, 405));
