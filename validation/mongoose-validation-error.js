@@ -12,33 +12,32 @@ class MongooseValidationError extends HTTPError {
      * @param   {MongooseError} err     The error coming from mongoose
      */
     constructor(err) {
-        const errKeys = Object.keys(err.errors);
-
-        let errorMessage = err.message;
-        if (errKeys.length > 0) {
-            const firstErr = err.errors[errKeys[0]];
-            switch (firstErr.kind) {
+        const getErrorMessage = (err) => {
+            switch (err.kind) {
                 case "Number":
-                    errorMessage = `${firstErr.path} must be a valid number`;
-                    break;
+                case "number":
+                    return `${err.path} must be a valid number`;
 
                 case "required":
-                    errorMessage = `${firstErr.path} is required`;
-                    break;
+                    return `${err.path} is required`;
 
                 case "min":
-                    errorMessage = `${firstErr.path} must not be less than ${firstErr.properties.min}`;
-                    break;
+                    return `${err.path} must not be less than ${err.properties.min}`;
 
                 case "max":
-                    errorMessage = `${firstErr.path} must not be greater than ${firstErr.properties.max}`;
-                    break;
+                    return `${err.path} must not be greater than ${err.properties.max}`;
 
                 case "ObjectID":
-                    errorMessage = 'You must not specify an _id';
-                    break;
+                    return '_id is not a valid id';
+
+                default:
+                    return err.message;
             }
-        }
+        };
+
+        const errorMessage = err.errors
+            ? getErrorMessage(err.errors[Object.keys(err.errors)[0]])
+            : getErrorMessage(err);
 
         super(errorMessage, 400);
     }

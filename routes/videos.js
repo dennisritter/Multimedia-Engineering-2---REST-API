@@ -20,19 +20,18 @@ var logger = require('debug')('me2u4:videos');
 //load mongoose module
 const mongoose = require('mongoose');
 
-//remove?
-const {validateComplete, validatePatch, validateId, allKeys} = require('./../validation/videos');
 const {filterParserFactory} = require('./../restapi/filter');
 
 //load mongoose VideoModel
 var VideoModel = require('./../models/video');
+
 //load HTTPError constructor
 const HTTPError = require('./../validation/http-error');
 const MongooseValidationError = require('./../validation/mongoose-validation-error');
 
 var videos = express.Router();
 
-videos.use(filterParserFactory(Object.keys(allKeys)));
+videos.use(filterParserFactory(Object.keys(VideoModel.schema.paths)));
 
 const methodNotAllowed = (req, res, next) => {
     return next(new HTTPError(`Method ${req.method} is not allowed.`, 405));
@@ -42,16 +41,19 @@ const methodNotAllowed = (req, res, next) => {
 videos.route('/')
     .get(function(req, res, next) {
 
-        VideoModel.find({}, res.locals.filterParams.filter, {limit: res.locals.filterParams.limit, skip: res.locals.filterParams.offset},(err, items) => {
+        VideoModel.find({}, res.locals.filterParams.filter, {limit: res.locals.filterParams.limit, skip: res.locals.filterParams.offset}, (err, items) => {
             if (err) {
                 // Any error here must be related to internal error reasons
-                return next(new HTTPError('Internal Server Error', 500));
+                return next(HTTPError.Error500);
             }
 
             res.status(200).json(items);
         })
     })
     .post(function(req, res, next) {
+        delete req.body._id;
+        delete req.body.__v;
+
         const video = new VideoModel(req.body);
         video.save((err) => {
             if (err) {
@@ -70,7 +72,7 @@ videos.route('/:id')
 
         VideoModel.findById(req.params.id, res.locals.filterParams.filter, (err, item) => {
             if (!item) {
-                return next(new HTTPError('Resource does not exist.', 404));
+                return next(HTTPError.Error404);
             }
 
             if (err) {
@@ -78,7 +80,8 @@ videos.route('/:id')
                 return next(new HTTPError(err.message, 500));
             }
 
-            res.status(200).json(item);
+            res.locals.items = item;
+            next();
         })
     })
     .put((req,res,next) => {
@@ -89,27 +92,42 @@ videos.route('/:id')
         // Validate new record
         video.validate((err) => {
             if (err) {
-                return next(new HTTPError(err.message, 400));
+                return next(new MongooseValidationError(err));
             }
 
             // Create plain object with model data
             const videoObject = video.toObject();
 
+            // videoObject._id is an ObjectID and must be compared with .equals method
+            if (!videoObject._id.equals(req.params.id)) {
+                return next(new HTTPError('The provided _id does not match the one specified in the resource url', 409));
+            }
+
             // Delete id and version from updates (avoid change of id and version)
             delete videoObject._id;
             delete videoObject.__v;
 
-            // Replace old record with new record
-            VideoModel.findOneAndUpdate({_id: req.params.id}, {$set: videoObject}, {
-                new: true,
-                setDefaultsOnInsert: true
-            }, (err, item) => {
+            VideoModel.findById(req.params.id, (err, item) => {
                 if (err) {
-                    return next(new HTTPError(err.message, 500));
+                    return next(HTTPError.Error500);
                 }
 
-                // Respond with new record data
-                res.status(200).json(item);
+                if (!item) {
+                    return next(HTTPError.Error404);
+                }
+
+                if (item.updatedAt.toString() !== videoObject.updatedAt.toString()) {
+                    return next(new HTTPError('The provided updatedAt timestamp does not match the current resource state.', 409));
+                }
+
+                VideoModel.findOneAndUpdate({_id: req.params.id}, {$set: videoObject}, {new: true}, (err, item) => {
+                    if (err) {
+                        return next(HTTPError.Error500);
+                    }
+
+                    res.locals.items = item;
+                    next();
+                });
             });
         });
 
@@ -118,11 +136,11 @@ videos.route('/:id')
     .delete(function(req, res, next) {
         VideoModel.findByIdAndRemove(req.params.id, (err, item) => {
             if (err) {
-                return next(new HTTPError(err.message, 500));
+                return next(HTTPError.Error500);
             }
 
             if (!item) {
-                return next(new HTTPError('Resource does not exist', 404));
+                return next(HTTPError.Error404);
             }
 
             next();
@@ -130,13 +148,23 @@ videos.route('/:id')
     })
     .patch((req, res, next) => {
         if(req.body._id && (req.params.id !== req.body._id)){
-            return next(new HTTPError('The _id sent in body is invalid.', 400));
+            return next(new HTTPError('The provided _id does not match the one specified in the resource url.', 400));
         }
+
+        delete req.body._id;
+        delete req.body.__v;
+
         VideoModel.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true}, (err, item) => {
-            if(err){
-                return next(new HTTPError(err.message, 404));
+            if (err) {
+                return next(new MongooseValidationError(err));
             }
-            res.status(200).json(item);
+
+            if (!item) {
+                return next(HTTPError.Error404);
+            }
+
+            res.locals.items = item;
+            next();
         });
     })
     .post(methodNotAllowed);

@@ -5,6 +5,14 @@
  */
 class HTTPError extends Error {
 
+    static get Error500 () {
+        return new HTTPError('Internal Server Error', 500);
+    };
+
+    static get Error404 () {
+        return new HTTPError('Resource does not exist', 404);
+    }
+
     /**
      * The constructor
      * @param message - The error message

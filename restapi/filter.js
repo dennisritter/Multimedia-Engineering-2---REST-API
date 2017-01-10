@@ -28,7 +28,8 @@ const filterParserFactory = (availableKeys) => {
         //Parse and validate offset
         if (req.query.hasOwnProperty('offset')) {
             filterParams.offset = parseInt(req.query.offset);
-            if(isNaN(filterParams.offset) || filterParams.offset < 0){
+
+            if (isNaN(filterParams.offset) || filterParams.offset < 0){
                 return next(new HTTPError('Offset must be a number >= 0', 400));
             }
         }
@@ -36,7 +37,8 @@ const filterParserFactory = (availableKeys) => {
         //Parse and validate limit
         if (req.query.hasOwnProperty('limit')) {
             filterParams.limit = parseInt(req.query.limit);
-            if(isNaN(filterParams.limit) || filterParams.limit <= 0) {
+
+            if (isNaN(filterParams.limit) || filterParams.limit <= 0) {
                 return next(new HTTPError('Limit must be a number > 0', 400));
             }
         }
