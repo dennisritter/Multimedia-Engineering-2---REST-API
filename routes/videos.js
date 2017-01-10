@@ -47,7 +47,8 @@ videos.route('/')
                 return next(HTTPError.Error500);
             }
 
-            res.status(200).json(items);
+            res.locals.items = item;
+            next();
         })
     })
     .post(function(req, res, next) {
@@ -99,7 +100,7 @@ videos.route('/:id')
             const videoObject = video.toObject();
 
             // videoObject._id is an ObjectID and must be compared with .equals method
-            if (!videoObject._id.equals(req.params.id)) {
+            if (!videoObject._id || !videoObject._id.equals(req.params.id)) {
                 return next(new HTTPError('The provided _id does not match the one specified in the resource url', 409));
             }
 

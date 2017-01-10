@@ -62,7 +62,7 @@ app.use(function(req, res, next) {
     // if anything to send has been added to res.locals.items
     if (res.locals.items) {
         // then we send it as json and remove it
-        res.json(res.locals.items);
+        res.status(200).json(res.locals.items);
         delete res.locals.items;
     }
     else {
